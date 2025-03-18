@@ -20,13 +20,14 @@
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 5px;
-      max-width: 900px;
+      max-width: 1100px;
       margin: 20px auto;
     }
     .category, .question {
       background: #007acc;
       color: #fff;
-      padding: 15px;
+      padding: 25px;
+      font-size: 1.3em;
       cursor: pointer;
       border-radius: 5px;
       transition: background 0.3s;
@@ -38,17 +39,23 @@
       font-weight: bold;
       cursor: default;
     }
+    /* Scoreboard styles */
     #scoreBoard {
-      max-width: 600px;
+      max-width: 800px;
       margin: 20px auto;
       display: flex;
       justify-content: space-around;
     }
     .playerScore {
       background: #e0e0e0;
-      padding: 10px;
+      padding: 15px;
       border-radius: 5px;
-      width: 30%;
+      width: 25%;
+      transition: box-shadow 0.3s;
+    }
+    .active-player {
+      box-shadow: 0 0 15px 5px gold;
+      background: #fffacd;
     }
     /* Modal styles */
     .modal {
@@ -64,15 +71,15 @@
     }
     .modal-content {
       background: #fff;
-      margin: 10% auto;
+      margin: 5% auto;
       padding: 20px;
-      max-width: 600px;
+      max-width: 700px;
       border-radius: 5px;
       text-align: left;
     }
     .choice {
       margin: 10px 0;
-      padding: 10px;
+      padding: 12px;
       background: #f0f0f0;
       cursor: pointer;
       border-radius: 3px;
@@ -80,17 +87,28 @@
     .choice:hover {
       background: #ddd;
     }
+    .selected {
+      background: #cce5ff;
+      border: 2px solid #3399ff;
+    }
     button {
-      margin-top: 15px;
+      margin: 10px 5px 0 5px;
       padding: 10px 20px;
+      font-size: 1em;
       cursor: pointer;
+    }
+    input[type="number"] {
+      font-size: 1em;
+      padding: 8px;
+      width: 100px;
+      margin-right: 10px;
     }
   </style>
 </head>
 <body>
   <header>
     <h1>DNA Elimination Jeopardy</h1>
-    <p>A game based on research papers about programmed DNA elimination</p>
+    <p>A game based on research about programmed DNA elimination</p>
   </header>
   
   <section id="playerSetup">
@@ -105,98 +123,321 @@
   
   <section id="gameBoard" style="display:none;"></section>
   
-  <!-- Modal for questions -->
+  <!-- Modal for questions and wager -->
   <div id="questionModal" class="modal">
     <div class="modal-content">
       <h2 id="questionText"></h2>
-      <div id="choices"></div>
+      <div id="modalContent"></div>
+      <div id="choiceContainer"></div>
+      <button id="confirmButton" style="display:none;" onclick="confirmAnswer()">Confirm Answer</button>
       <p id="feedback" style="font-weight:bold;"></p>
       <button onclick="closeModal()">Continue</button>
     </div>
   </div>
   
   <script>
-    // Sample data: categories, questions, and multiple choice answers.
-    // In a production version, you can expand this bank.
+    // Global variables
+    let players = [];
+    let currentPlayer = 0;
+    let boardData = {}; // holds questions per category (deep copy of gameData)
+    let selectedChoiceIndex = null;
+    let currentQuestion = null;
+    let currentCategory = "";
+    let currentIndex = -1;
+    let currentWager = 0; // used for Daily Double
+    
+    // Game data: 5 categories with 5 questions each.
+    // Point values: 100, 200, 300, 400, 500.
     const gameData = {
       "DNA Elimination Basics": [
         {
-          question: "What is the primary function of programmed DNA elimination in nematodes?",
-          choices: ["A. To repair mutations", "B. To permanently silence germline genes", "C. To initiate cell division", "D. To elongate telomeres"],
-          answer: 1,
+          question: "What is the primary biological role of programmed DNA elimination in nematodes?",
+          choices: [
+            "A. To remove repetitive DNA and germline-specific genes",
+            "B. To increase genetic diversity in somatic cells",
+            "C. To repair damaged DNA sequences",
+            "D. To stimulate cell division"
+          ],
+          answer: 0,
           value: 100
         },
         {
-          question: "Which statement best describes DNA elimination?",
-          choices: ["A. It occurs randomly", "B. It is a highly reproducible process", "C. It increases genome size", "D. It occurs in all cells"],
+          question: "During PDE, which outcome best describes the fate of eliminated sequences?",
+          choices: [
+            "A. They are integrated into the somatic genome",
+            "B. They are permanently removed and degraded",
+            "C. They are stored for later reactivation",
+            "D. They form extra-chromosomal circles"
+          ],
           answer: 1,
           value: 200
+        },
+        {
+          question: "Programmed DNA elimination in nematodes most commonly occurs during:",
+          choices: [
+            "A. The larval stage",
+            "B. Early embryogenesis",
+            "C. Adult stage",
+            "D. Metamorphosis"
+          ],
+          answer: 1,
+          value: 300
+        },
+        {
+          question: "What best explains the specificity of sequences targeted during PDE?",
+          choices: [
+            "A. They contain unique motifs that signal for elimination",
+            "B. They are randomly chosen during cell division",
+            "C. They are solely marked by epigenetic modifications",
+            "D. They are actively transcribed in somatic cells"
+          ],
+          answer: 0,
+          value: 400
+        },
+        {
+          question: "Why is PDE considered an irreversible form of gene silencing in nematodes?",
+          choices: [
+            "A. Eliminated genes are later reinserted",
+            "B. The process permanently removes sequences from somatic cells",
+            "C. It only temporarily represses gene expression",
+            "D. It triggers compensatory genetic pathways"
+          ],
+          answer: 1,
+          value: 500
         }
       ],
       "Ascaris": [
         {
-          question: "During programmed DNA elimination in Ascaris, what happens at the chromosome ends?",
-          choices: ["A. They are elongated", "B. They are completely retained", "C. They undergo DNA breaks and de novo telomere healing", "D. They fuse together"],
-          answer: 2,
+          question: "In Ascaris, what happens to the germline chromosome ends during DNA elimination?",
+          choices: [
+            "A. They are retained unchanged",
+            "B. They are broken and re-healed with new telomeres",
+            "C. They are duplicated",
+            "D. They are methylated and silenced"
+          ],
+          answer: 1,
           value: 100
         },
         {
           question: "Approximately how many germline-expressed genes are eliminated in Ascaris?",
-          choices: ["A. 100", "B. 500", "C. 1000", "D. 2000"],
+          choices: [
+            "A. Around 100",
+            "B. Approximately 500",
+            "C. About 1000",
+            "D. Over 2000"
+          ],
           answer: 2,
           value: 200
+        },
+        {
+          question: "Which genomic technique was key to assembling complete Ascaris chromosomes?",
+          choices: [
+            "A. Sanger sequencing",
+            "B. PacBio long-read sequencing and Hi-C",
+            "C. Microarray analysis",
+            "D. RNA-Seq"
+          ],
+          answer: 1,
+          value: 300
+        },
+        {
+          question: "What structural change results in the Ascaris somatic genome after PDE?",
+          choices: [
+            "A. Fusion of chromosomes",
+            "B. Increased chromosome number due to splitting",
+            "C. Deletion of centromeric regions",
+            "D. Random fragmentation without repair"
+          ],
+          answer: 1,
+          value: 400
+        },
+        {
+          question: "Comparative genomics in Ascaris has shown that chromosome fusions in the germline lead to:",
+          choices: [
+            "A. Reduced genome size",
+            "B. Formation of independent somatic chromosomes",
+            "C. No change in karyotype",
+            "D. Duplication of eliminated sequences"
+          ],
+          answer: 1,
+          value: 500
         }
       ],
       "Oscheius tipulae": [
         {
-          question: "What conserved motif is required for DNA break during PDE in Oscheius tipulae?",
-          choices: ["A. TATA box", "B. SFE (Sequence For Elimination)", "C. Poly-A tail", "D. CpG island"],
+          question: "What conserved sequence motif is required for DNA break during PDE in Oscheius tipulae?",
+          choices: [
+            "A. TATA box",
+            "B. SFE (Sequence For Elimination)",
+            "C. CAAT box",
+            "D. Polyadenylation signal"
+          ],
           answer: 1,
           value: 100
         },
         {
-          question: "Oscheius tipulae is considered a good genetic model for PDE because:",
-          choices: ["A. It has a large genome", "B. It has a short life cycle and is genetically tractable", "C. It is parasitic", "D. It does not eliminate any DNA"],
-          answer: 1,
+          question: "At which embryonic stage does PDE typically occur in Oscheius tipulae?",
+          choices: [
+            "A. 2-cell stage",
+            "B. 4-cell stage",
+            "C. 8- to 16-cell stage",
+            "D. L1 larval stage"
+          ],
+          answer: 2,
           value: 200
+        },
+        {
+          question: "Why is Oscheius tipulae considered a favorable model for studying PDE?",
+          choices: [
+            "A. It has a large, complex genome",
+            "B. It has a short life cycle and is genetically tractable",
+            "C. It does not undergo DNA elimination",
+            "D. It is resistant to genetic manipulation"
+          ],
+          answer: 1,
+          value: 300
+        },
+        {
+          question: "Mutations in which element of Oscheius tipulae cause a ‘fail-to-eliminate’ phenotype?",
+          choices: [
+            "A. SFE motif",
+            "B. Telomere repeat",
+            "C. Centromere region",
+            "D. Satellite DNA"
+          ],
+          answer: 0,
+          value: 400
+        },
+        {
+          question: "END-seq analysis in Oscheius tipulae revealed that DNA breaks during PDE are characterized by:",
+          choices: [
+            "A. Uniform break sites with minimal resection",
+            "B. Extensive end resection at break sites within the SFE motif",
+            "C. No observable resection",
+            "D. Random distribution across the genome"
+          ],
+          answer: 1,
+          value: 500
         }
       ],
       "Telomere Healing": [
         {
-          question: "What process restores the broken chromosome ends during DNA elimination in nematodes?",
-          choices: ["A. DNA replication", "B. Nonhomologous end joining", "C. De novo telomere addition", "D. Homologous recombination"],
+          question: "What process restores broken chromosome ends during PDE in nematodes?",
+          choices: [
+            "A. Homologous recombination",
+            "B. Nonhomologous end joining",
+            "C. De novo telomere addition",
+            "D. DNA methylation"
+          ],
           answer: 2,
           value: 100
         },
         {
-          question: "In Ascaris, telomere healing is biased towards:",
-          choices: ["A. Eliminated DSB ends", "B. Retained DSB ends", "C. Both equally", "D. None of the above"],
-          answer: 1,
+          question: "In Ascaris, telomere healing is biased toward which DSB ends?",
+          choices: [
+            "A. Retained ends",
+            "B. Eliminated ends",
+            "C. Both equally",
+            "D. Neither"
+          ],
+          answer: 0,
           value: 200
+        },
+        {
+          question: "Which enzyme is central to de novo telomere addition in nematodes?",
+          choices: [
+            "A. DNA polymerase",
+            "B. Telomerase",
+            "C. Ligase",
+            "D. Helicase"
+          ],
+          answer: 1,
+          value: 300
+        },
+        {
+          question: "How does the extent of end resection differ in Ascaris between retained and eliminated DNA ends?",
+          choices: [
+            "A. Retained ends undergo more resection",
+            "B. Eliminated ends undergo more resection",
+            "C. Both are resected equally",
+            "D. Neither undergoes resection"
+          ],
+          answer: 1,
+          value: 400
+        },
+        {
+          question: "Which molecular technique maps de novo telomere addition sites during PDE?",
+          choices: [
+            "A. END-seq",
+            "B. RNA-Seq",
+            "C. ChIP-Seq",
+            "D. ATAC-Seq"
+          ],
+          answer: 0,
+          value: 500
         }
       ],
       "Evolution & Function": [
         {
-          question: "Programmed DNA elimination is thought to contribute to:",
-          choices: ["A. Increased mutation rates", "B. Genome stability and evolution", "C. Viral infection", "D. Uncontrolled cell growth"],
+          question: "PDE may confer an evolutionary advantage by:",
+          choices: [
+            "A. Increasing genome size",
+            "B. Removing deleterious germline-specific sequences",
+            "C. Enhancing cell proliferation",
+            "D. Stabilizing telomere length"
+          ],
           answer: 1,
           value: 100
         },
         {
-          question: "Comparative genomics of PDE suggests that:",
-          choices: ["A. All nematodes eliminate the same sequences", "B. PDE may have evolved independently in different lineages", "C. PDE only occurs in parasitic species", "D. PDE does not affect evolution"],
+          question: "Comparative genomics indicates that PDE in nematodes:",
+          choices: [
+            "A. Evolved only once in a common ancestor",
+            "B. May have evolved independently in different lineages",
+            "C. Is unique to parasitic species",
+            "D. Does not affect chromosome structure"
+          ],
           answer: 1,
           value: 200
+        },
+        {
+          question: "Eliminating germline-expressed genes in somatic cells primarily serves to:",
+          choices: [
+            "A. Prevent unwanted gene expression in differentiated tissues",
+            "B. Increase genetic diversity in somatic cells",
+            "C. Promote rapid cell division",
+            "D. Inhibit DNA replication"
+          ],
+          answer: 0,
+          value: 300
+        },
+        {
+          question: "PDE has been implicated in the evolution of which genomic feature in nematodes?",
+          choices: [
+            "A. Increased intron density",
+            "B. Chromosome fusion and karyotype diversification",
+            "C. Expanded gene families",
+            "D. Enhanced mitochondrial function"
+          ],
+          answer: 1,
+          value: 400
+        },
+        {
+          question: "How might PDE contribute to speciation in nematodes?",
+          choices: [
+            "A. By generating irreversible genomic changes that lead to reproductive isolation",
+            "B. By increasing gene flow between populations",
+            "C. By conserving ancestral gene order",
+            "D. By promoting horizontal gene transfer"
+          ],
+          answer: 0,
+          value: 500
         }
       ]
     };
-    
-    let players = [];
-    let currentPlayer = 0;
-    let boardData = []; // to track which questions remain
-    
+
+    // Start the game: initialize players, board, and choose a random Daily Double.
     function startGame(numPlayers) {
-      // Set up player scores
       players = [];
       for (let i = 1; i <= numPlayers; i++) {
         players.push({ name: "Player " + i, score: 0 });
@@ -204,8 +445,11 @@
       document.getElementById('playerSetup').style.display = 'none';
       displayScoreBoard();
       setupBoard();
+      pickDailyDouble();
+      document.getElementById('gameBoard').style.display = 'grid';
     }
     
+    // Display scoreboard and highlight active player.
     function displayScoreBoard() {
       const scoreBoard = document.getElementById('scoreBoard');
       scoreBoard.innerHTML = "";
@@ -213,79 +457,205 @@
         const div = document.createElement('div');
         div.className = 'playerScore';
         div.id = 'player' + index;
+        if (index === currentPlayer) {
+          div.classList.add('active-player');
+        }
         div.innerHTML = `<h3>${player.name}</h3><p>Score: <span id="score${index}">${player.score}</span></p>`;
         scoreBoard.appendChild(div);
       });
       scoreBoard.style.display = 'flex';
     }
     
+    // Set up the game board based on gameData.
     function setupBoard() {
-      boardData = JSON.parse(JSON.stringify(gameData)); // deep copy
+      // Deep copy gameData into boardData so we can mark questions as answered.
+      boardData = JSON.parse(JSON.stringify(gameData));
       const gameBoard = document.getElementById('gameBoard');
       gameBoard.innerHTML = "";
-      
-      // First row: category headers
+      // Create category headers.
       Object.keys(boardData).forEach(category => {
         const div = document.createElement('div');
         div.className = 'category';
         div.textContent = category;
         gameBoard.appendChild(div);
       });
-      
-      // Assume each category has same number of questions
+      // Assume each category has the same number of questions.
       const numQuestions = boardData[Object.keys(boardData)[0]].length;
       for (let i = 0; i < numQuestions; i++) {
         Object.keys(boardData).forEach(category => {
           const qData = boardData[category][i];
-          const div = document.createElement('div');
-          div.className = 'question';
-          div.textContent = "$" + qData.value;
-          div.onclick = function() { openQuestion(category, i); };
-          gameBoard.appendChild(div);
+          const cell = document.createElement('div');
+          cell.className = 'question';
+          cell.id = category + "-" + i;
+          cell.textContent = "$" + qData.value;
+          cell.onclick = function() { openQuestion(category, i); };
+          gameBoard.appendChild(cell);
         });
       }
-      gameBoard.style.display = 'grid';
     }
     
+    // Randomly pick one square as Daily Double (hidden from players).
+    function pickDailyDouble() {
+      const categories = Object.keys(boardData);
+      // Total number of questions across categories.
+      const total = categories.length * boardData[categories[0]].length;
+      const rand = Math.floor(Math.random() * total);
+      const catIndex = Math.floor(rand / boardData[categories[0]].length);
+      const qIndex = rand % boardData[categories[0]].length;
+      const chosenCategory = categories[catIndex];
+      boardData[chosenCategory][qIndex].dailyDouble = true;
+      // (Daily Double remains hidden on the board.)
+    }
+    
+    // Open a question; if Daily Double, prompt wager.
     function openQuestion(category, index) {
-      // If question already answered, do nothing
+      // If question already answered, do nothing.
       if (!boardData[category] || !boardData[category][index]) return;
+      currentCategory = category;
+      currentIndex = index;
+      currentQuestion = boardData[category][index];
+      selectedChoiceIndex = null;
+      currentWager = 0;
       
-      const qData = boardData[category][index];
-      document.getElementById('questionText').textContent = qData.question;
-      const choicesDiv = document.getElementById('choices');
-      choicesDiv.innerHTML = "";
-      qData.choices.forEach((choice, idx) => {
-        const p = document.createElement('p');
-        p.className = 'choice';
-        p.textContent = choice;
-        p.onclick = function() { checkAnswer(category, index, idx); };
-        choicesDiv.appendChild(p);
-      });
+      // Clear previous modal content.
+      document.getElementById('questionText').textContent = "";
+      document.getElementById('modalContent').innerHTML = "";
+      document.getElementById('choiceContainer').innerHTML = "";
       document.getElementById('feedback').textContent = "";
+      document.getElementById('confirmButton').style.display = 'none';
+      
+      // Set question header.
+      document.getElementById('questionText').textContent = currentQuestion.question;
+      
+      // If this square is a Daily Double, prompt for wager.
+      if (currentQuestion.dailyDouble) {
+        const wagerDiv = document.createElement('div');
+        wagerDiv.innerHTML = `<p><strong>Daily Double!</strong> Enter your wager (max: ${
+          players[currentPlayer].score > 0 ? players[currentPlayer].score : 1000
+        }):</p>`;
+        const wagerInput = document.createElement('input');
+        wagerInput.type = "number";
+        wagerInput.id = "wagerInput";
+        wagerInput.value = currentQuestion.value;
+        wagerDiv.appendChild(wagerInput);
+        const wagerButton = document.createElement('button');
+        wagerButton.textContent = "Confirm Wager";
+        wagerButton.onclick = confirmWager;
+        wagerDiv.appendChild(wagerButton);
+        document.getElementById('modalContent').appendChild(wagerDiv);
+      } else {
+        // If not Daily Double, show the choices immediately.
+        showChoices();
+      }
+      
+      // Display the modal.
       document.getElementById('questionModal').style.display = 'block';
     }
     
-    function checkAnswer(category, index, selected) {
-      const qData = boardData[category][index];
-      const feedback = document.getElementById('feedback');
-      if (selected === qData.answer) {
-        feedback.textContent = "Correct!";
-        players[currentPlayer].score += qData.value;
-      } else {
-        feedback.textContent = "Incorrect. The correct answer was: " + qData.choices[qData.answer];
-        // Optionally subtract points here if desired.
+    // Confirm wager for Daily Double.
+    function confirmWager() {
+      const wagerInput = document.getElementById('wagerInput');
+      let wager = parseInt(wagerInput.value);
+      const maxWager = players[currentPlayer].score > 0 ? players[currentPlayer].score : 1000;
+      if (isNaN(wager) || wager <= 0) {
+        alert("Please enter a positive wager.");
+        return;
       }
-      // Update score board for current player
-      document.getElementById('score' + currentPlayer).textContent = players[currentPlayer].score;
-      // Mark the question as answered
-      delete boardData[category][index];
-      // Rotate player turn if more than one player
-      if (players.length > 1) {
-        currentPlayer = (currentPlayer + 1) % players.length;
+      if (wager > maxWager) {
+        alert("Your wager cannot exceed " + maxWager + " points.");
+        return;
       }
+      currentWager = wager;
+      // Clear wager prompt and show choices.
+      document.getElementById('modalContent').innerHTML = "";
+      showChoices();
     }
     
+    // Display multiple-choice answers.
+    function showChoices() {
+      const choiceContainer = document.getElementById('choiceContainer');
+      choiceContainer.innerHTML = "";
+      currentQuestion.choices.forEach((choice, idx) => {
+        const p = document.createElement('p');
+        p.className = 'choice';
+        p.textContent = choice;
+        p.onclick = function() { selectChoice(p, idx); };
+        choiceContainer.appendChild(p);
+      });
+      // Show Confirm Answer button.
+      document.getElementById('confirmButton').style.display = 'inline-block';
+    }
+    
+    // Handle choice selection: highlight selected answer.
+    function selectChoice(element, idx) {
+      // Remove highlight from any previously selected choice.
+      const choices = document.getElementsByClassName('choice');
+      for (let i = 0; i < choices.length; i++) {
+        choices[i].classList.remove('selected');
+      }
+      element.classList.add('selected');
+      selectedChoiceIndex = idx;
+    }
+    
+    // Confirm the answer once the player clicks "Confirm Answer".
+    function confirmAnswer() {
+      if (selectedChoiceIndex === null) {
+        alert("Please select an answer before confirming.");
+        return;
+      }
+      let wagerOrValue = currentQuestion.dailyDouble ? currentWager : currentQuestion.value;
+      let feedbackText = "";
+      // Check if the answer is correct.
+      if (selectedChoiceIndex === currentQuestion.answer) {
+        feedbackText = "Correct! You gain " + wagerOrValue + " points.";
+        players[currentPlayer].score += wagerOrValue;
+        // In multiplayer, if correct, the same player continues.
+      } else {
+        feedbackText = "Incorrect. The correct answer was: " + currentQuestion.choices[currentQuestion.answer] + 
+                       ". You lose " + wagerOrValue + " points.";
+        players[currentPlayer].score -= wagerOrValue;
+        // In multiplayer mode, switch turn only if answer is wrong.
+        if (players.length > 1) {
+          currentPlayer = (currentPlayer + 1) % players.length;
+        }
+      }
+      document.getElementById('feedback').textContent = feedbackText;
+      updateScoreBoard();
+      updateActivePlayerDisplay();
+      // Mark question as answered by removing it from boardData.
+      delete boardData[currentCategory][currentIndex];
+      // Grey out the corresponding board cell.
+      const cell = document.getElementById(currentCategory + "-" + currentIndex);
+      if (cell) {
+        cell.style.background = "#555";
+        cell.style.color = "#aaa";
+        cell.onclick = null;
+        cell.textContent = "";
+      }
+      // Hide confirm button to prevent re-submission.
+      document.getElementById('confirmButton').style.display = 'none';
+    }
+    
+    // Update scoreboard display.
+    function updateScoreBoard() {
+      players.forEach((player, index) => {
+        document.getElementById('score' + index).textContent = player.score;
+      });
+    }
+    
+    // Highlight the active player's score box.
+    function updateActivePlayerDisplay() {
+      players.forEach((_, index) => {
+        const playerDiv = document.getElementById('player' + index);
+        if (index === currentPlayer) {
+          playerDiv.classList.add('active-player');
+        } else {
+          playerDiv.classList.remove('active-player');
+        }
+      });
+    }
+    
+    // Close the modal.
     function closeModal() {
       document.getElementById('questionModal').style.display = 'none';
     }
