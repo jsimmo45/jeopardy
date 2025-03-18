@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Programmed DNA Elimination Jeopardy!</title>
   <style>
-    /* Increase base font sizes for better visibility */
+    /* Base styling for increased readability */
     body {
       font-family: Arial, sans-serif;
       background: #f0f8ff;
@@ -118,6 +118,11 @@
       background: #cce5ff;
       border: 2px solid #3399ff;
     }
+    input[type="number"] {
+      width: 150px;
+      font-size: 1em;
+      padding: 8px;
+    }
     hr {
       border: 1px solid #ccc;
       margin: 20px 0;
@@ -175,19 +180,22 @@
     let questionsAnswered = 0;
     const totalQuestionsPerRound = 25; // 5 categories x 5 questions each
     let roundData = {}; // Board data for current round
-    let currentCategories = []; // Array to hold chosen categories (fixed order for the board)
     let selectedChoiceIndex = null;
     let currentQuestion = null;
     let currentCategory = "";
     let currentIndex = -1;
     let currentWager = 0; // For Daily Double
-    
-    // Full question bank with 5 questions per category (including explanations)
-    // We now add a new category "Data & Interpretation" with tougher, data‐driven questions.
-    const fullQuestionBank = {
-      "DNA Elimination Basics": [
+
+    // Fixed category names for each round (punny titles)
+    const round1Categories = ["Elimin-8 or Not", "Ascari-ology", "Oscheius Underfoot", "Telomere Time", "Data Dilemma"];
+    const round2Categories = ["Parascaris Paradox", "C. Elegance", "Method to the Madness", "Research Riddles", "Evo-lution Revolution"];
+
+    // ------------------ Round 1 Question Bank ------------------
+    // Each category has exactly 5 questions.
+    const round1Bank = {
+      "Elimin-8 or Not": [
         {
-          question: "What is the primary role of programmed DNA elimination in nematodes?",
+          question: "In nematodes, what is the primary role of programmed DNA elimination?",
           choices: [
             "To remove germline-specific sequences",
             "To repair damaged DNA",
@@ -196,7 +204,7 @@
           ],
           answer: 0,
           value: 100,
-          explanation: "PDE removes germline-specific sequences from somatic cells to permanently silence them."
+          explanation: "PDE removes germline-specific sequences from somatic cells, ensuring those genes are permanently silenced."
         },
         {
           question: "Which statement best describes PDE?",
@@ -208,10 +216,10 @@
           ],
           answer: 1,
           value: 200,
-          explanation: "PDE is tightly regulated and reproducible, ensuring the same sequences are eliminated each time."
+          explanation: "PDE is highly regulated, ensuring that the same sequences are consistently eliminated."
         },
         {
-          question: "PDE typically occurs during which developmental stage?",
+          question: "PDE typically occurs during which developmental stage in nematodes?",
           choices: [
             "Adult stage",
             "Late embryogenesis",
@@ -220,10 +228,10 @@
           ],
           answer: 2,
           value: 300,
-          explanation: "PDE occurs during early embryogenesis when the germline and somatic lineages are first distinguished."
+          explanation: "PDE occurs during early embryogenesis when the separation of germline and somatic cells begins."
         },
         {
-          question: "What type of genes are typically eliminated during PDE?",
+          question: "Which type of genes are most often eliminated during PDE?",
           choices: [
             "Housekeeping genes",
             "Germline-expressed genes",
@@ -232,33 +240,33 @@
           ],
           answer: 1,
           value: 400,
-          explanation: "Germline-expressed genes are removed to prevent their inappropriate expression in somatic cells."
+          explanation: "Germline-expressed genes are removed from somatic cells to prevent their unwanted expression."
         },
         {
-          question: "Why is PDE considered irreversible in somatic cells?",
+          question: "Which sequence of developmental stages correctly describes the life cycle of Ascaris lumbricoides?",
           choices: [
-            "Because eliminated DNA is permanently lost",
-            "Because DNA is quickly repaired",
-            "Because cells can reinsert the DNA later",
-            "Because the process is reversible through recombination"
+            "Egg → Larva (lung migration) → Adult in intestine",
+            "Egg → Adult in intestine → Larva in bloodstream",
+            "Larva → Egg → Adult in muscle",
+            "Adult in intestine → Egg → Larva in soil"
           ],
           answer: 0,
           value: 500,
-          explanation: "Once DNA is eliminated in somatic cells, it is permanently removed from the genome."
+          explanation: "Ascaris lumbricoides has a well-established life cycle: eggs are ingested, larvae hatch and migrate (including lung passage), then mature into adults in the intestine."
         }
       ],
-      "Ascaris": [
+      "Ascari-ology": [
         {
-          question: "During PDE in Ascaris, what happens to the chromosome ends?",
+          question: "In Ascaris, during PDE, what happens to the chromosome ends?",
           choices: [
             "They are elongated",
             "They are methylated",
-            "They are broken and re-healed",
+            "They are broken and re-healed with new telomeres",
             "They fuse with other chromosomes"
           ],
           answer: 2,
           value: 100,
-          explanation: "Chromosome ends in Ascaris are broken and then re-healed by de novo telomere addition."
+          explanation: "In Ascaris, chromosome ends are broken and subsequently re-healed by de novo telomere addition."
         },
         {
           question: "Approximately how many germline-expressed genes are eliminated in Ascaris?",
@@ -270,10 +278,10 @@
           ],
           answer: 2,
           value: 200,
-          explanation: "Research indicates that roughly 1000 germline-expressed genes are eliminated during PDE in Ascaris."
+          explanation: "Research shows that roughly 1000 germline-expressed genes are eliminated during PDE in Ascaris."
         },
         {
-          question: "Which technique enabled the complete assembly of Ascaris chromosomes?",
+          question: "Which technique enabled the complete assembly of the Ascaris genome?",
           choices: [
             "Sanger sequencing",
             "PacBio long-read sequencing with Hi-C",
@@ -282,7 +290,7 @@
           ],
           answer: 1,
           value: 300,
-          explanation: "The use of PacBio long-read sequencing in combination with Hi-C was key to assembling the complex Ascaris genome."
+          explanation: "Combining PacBio long-read sequencing with Hi-C data was key to assembling the complex Ascaris genome."
         },
         {
           question: "What is the outcome of chromosome remodeling in Ascaris after PDE?",
@@ -294,24 +302,25 @@
           ],
           answer: 1,
           value: 400,
-          explanation: "Chromosome remodeling results in the splitting of germline chromosomes into additional somatic chromosomes."
+          explanation: "PDE leads to the splitting of germline chromosomes into additional somatic chromosomes."
         },
+        // Life cycle question inserted here (replacing a genomics question)
         {
-          question: "Comparative genomics in Ascaris has revealed that PDE contributes to:",
+          question: "Which sequence correctly represents the life cycle of Ascaris lumbricoides?",
           choices: [
-            "Resolution of chromosome fusions",
-            "Increased gene expression",
-            "Random DNA loss",
-            "Enhanced DNA repair"
+            "Egg → Larva (lung migration) → Adult in intestine",
+            "Egg → Adult in intestine → Larva in bloodstream",
+            "Larva → Egg → Adult in muscle",
+            "Adult in intestine → Egg → Larva in soil"
           ],
           answer: 0,
           value: 500,
-          explanation: "PDE helps resolve fused chromosomes, contributing to a refined somatic karyotype."
+          explanation: "The correct life cycle of Ascaris lumbricoides is: ingestion of eggs, hatching into larvae that migrate (including via the lungs), and maturation into adults in the intestine."
         }
       ],
-      "Oscheius tipulae": [
+      "Oscheius Underfoot": [
         {
-          question: "Which conserved motif is essential for DNA break during PDE in O. tipulae?",
+          question: "In Oscheius tipulae, which conserved motif is essential for directing DNA breaks during PDE?",
           choices: [
             "TATA box",
             "SFE (Sequence For Elimination)",
@@ -320,10 +329,10 @@
           ],
           answer: 1,
           value: 100,
-          explanation: "The SFE motif is crucial for specifying where DNA breaks occur during PDE in O. tipulae."
+          explanation: "The SFE motif is critical in specifying where DNA breaks occur during PDE in Oscheius tipulae."
         },
         {
-          question: "At what embryonic stage does PDE occur in O. tipulae?",
+          question: "At which embryonic stage does PDE occur in Oscheius tipulae?",
           choices: [
             "2-cell stage",
             "4-cell stage",
@@ -332,22 +341,22 @@
           ],
           answer: 2,
           value: 200,
-          explanation: "PDE in O. tipulae takes place during the 8- to 16-cell stage of embryogenesis."
+          explanation: "PDE in Oscheius tipulae is observed during the 8- to 16-cell stage of embryogenesis."
         },
         {
-          question: "Why is O. tipulae an attractive model for studying PDE?",
+          question: "Which statement best describes the life cycle of Oscheius tipulae?",
           choices: [
-            "Its long life cycle",
-            "Its genetic tractability and short life cycle",
-            "Its large genome size",
-            "Its resistance to genetic manipulation"
+            "It is a free-living nematode with a rapid, soil-based life cycle completed in days",
+            "It is a parasitic nematode with a complex life cycle in animal hosts",
+            "It has an extended life cycle spanning several months",
+            "It alternates between free-living and parasitic phases"
           ],
-          answer: 1,
+          answer: 0,
           value: 300,
-          explanation: "O. tipulae’s short life cycle and ease of genetic manipulation make it an ideal model for studying PDE."
+          explanation: "Oscheius tipulae is a free-living nematode that completes its life cycle quickly—typically within a few days in soil."
         },
         {
-          question: "A mutation in which element leads to a 'fail-to-eliminate' phenotype in O. tipulae?",
+          question: "A mutation in which element leads to a 'fail-to-eliminate' phenotype in Oscheius tipulae?",
           choices: [
             "Telomere repeat",
             "SFE motif",
@@ -356,24 +365,24 @@
           ],
           answer: 1,
           value: 400,
-          explanation: "Mutations in the SFE motif disrupt the DNA break process, leading to a failure in proper DNA elimination."
+          explanation: "Mutations in the SFE motif disrupt the normal DNA break process, causing a failure in DNA elimination."
         },
         {
-          question: "END-seq analysis in O. tipulae revealed that DNA breaks are characterized by:",
+          question: "According to END-seq analysis, DNA breaks in Oscheius tipulae are characterized by:",
           choices: [
             "Minimal end resection",
-            "Extensive end resection within the SFE",
+            "Extensive end resection within the SFE motif",
             "No observable DNA break",
-            "Random distribution with no motif"
+            "Random break distribution with no motif"
           ],
           answer: 1,
           value: 500,
-          explanation: "END-seq shows that DNA breaks in O. tipulae involve extensive resection specifically at the SFE motif."
+          explanation: "END-seq data reveal that DNA breaks in Oscheius tipulae involve extensive end resection specifically at the SFE motif."
         }
       ],
-      "Telomere Healing": [
+      "Telomere Time": [
         {
-          question: "What is the process that restores broken chromosome ends in nematodes?",
+          question: "In nematodes, what process restores broken chromosome ends?",
           choices: [
             "Homologous recombination",
             "Nonhomologous end joining",
@@ -382,10 +391,10 @@
           ],
           answer: 2,
           value: 100,
-          explanation: "Broken ends are restored by de novo telomere addition, a critical repair process during PDE."
+          explanation: "Broken chromosome ends are restored by de novo telomere addition, a critical repair mechanism during PDE."
         },
         {
-          question: "In Ascaris, telomere healing is biased toward which DSB ends?",
+          question: "In Ascaris, telomere healing is biased toward which DNA ends?",
           choices: [
             "Retained ends",
             "Eliminated ends",
@@ -394,7 +403,7 @@
           ],
           answer: 0,
           value: 200,
-          explanation: "Telomere healing preferentially occurs on the retained ends, ensuring the integrity of somatic chromosomes."
+          explanation: "Telomere healing in Ascaris preferentially occurs on the retained ends of DNA breaks."
         },
         {
           question: "Which enzyme is central to the telomere addition process?",
@@ -406,19 +415,19 @@
           ],
           answer: 1,
           value: 300,
-          explanation: "Telomerase is responsible for adding telomeric repeats to broken chromosome ends during healing."
+          explanation: "Telomerase adds telomeric repeats to broken chromosome ends during de novo telomere addition."
         },
         {
-          question: "How does the extent of end resection differ in Ascaris between retained and eliminated ends?",
+          question: "How does the extent of end resection differ in Ascaris?",
           choices: [
             "Retained ends are more resected",
             "Eliminated ends are more resected",
             "Both are resected equally",
-            "Neither undergoes resection"
+            "Neither is resected"
           ],
           answer: 1,
           value: 400,
-          explanation: "Eliminated ends show more extensive resection compared to retained ends, affecting telomere healing outcomes."
+          explanation: "Eliminated ends exhibit more extensive resection than retained ends, influencing telomere healing."
         },
         {
           question: "Which technique is used to map de novo telomere addition sites?",
@@ -430,10 +439,325 @@
           ],
           answer: 0,
           value: 500,
-          explanation: "END-seq is the method used to pinpoint where new telomeres are added after DNA breaks."
+          explanation: "END-seq is the method employed to pinpoint the exact sites where new telomeres are added after DNA breaks."
         }
       ],
-      "Evolution & Function": [
+      "Data Dilemma": [
+        {
+          question: "In Ascaris research data, the consistent loss of subtelomeric regions during PDE suggests what about chromosome evolution?",
+          choices: [
+            "Random genomic degradation",
+            "An evolutionary mechanism to resolve chromosome fusions",
+            "A byproduct of high mutation rates",
+            "Experimental error"
+          ],
+          answer: 1,
+          value: 100,
+          explanation: "The loss of subtelomeric regions likely reflects an adaptation to resolve fused chromosomes."
+        },
+        {
+          question: "How does extensive end resection at DNA break sites inform our understanding of telomere healing?",
+          choices: [
+            "It suggests telomere healing is error-prone",
+            "It indicates a regulated process distinguishing retained from eliminated DNA",
+            "It implies resection is irrelevant",
+            "It occurs only in germline cells"
+          ],
+          answer: 1,
+          value: 200,
+          explanation: "Extensive resection indicates a controlled repair mechanism that favors healing of retained DNA."
+        },
+        {
+          question: "What is the significance of detecting additional DNA breaks as a fail-safe during PDE in Ascaris?",
+          choices: [
+            "It increases the chance of complete gene loss",
+            "It ensures no residual germline-specific DNA remains in somatic cells",
+            "It serves to initiate apoptosis",
+            "It compensates for telomere shortening"
+          ],
+          answer: 1,
+          value: 300,
+          explanation: "Additional breaks act as a fail-safe mechanism to guarantee complete elimination of unwanted DNA."
+        },
+        {
+          question: "What does the differential telomere healing between retained and eliminated DNA imply?",
+          choices: [
+            "Both are repaired identically",
+            "A repair bias favors healing of retained DNA",
+            "Telomere healing is completely random",
+            "Healing depends solely on sequence context"
+          ],
+          answer: 1,
+          value: 400,
+          explanation: "The data imply a repair bias that favors telomere healing on retained DNA ends."
+        },
+        {
+          question: "Based on the data from Ascaris, how might PDE drive genomic evolution?",
+          choices: [
+            "By introducing point mutations",
+            "By generating novel somatic chromosomes and resolving fusions",
+            "By maintaining a constant genome size",
+            "By increasing homologous recombination"
+          ],
+          answer: 1,
+          value: 500,
+          explanation: "PDE reshapes the genome by creating new somatic chromosomes and resolving fused chromosomes, driving evolution."
+        }
+      ]
+    };
+
+    // ------------------ Round 2 Question Bank ------------------
+    // Round 2 uses different categories.
+    const round2Bank = {
+      "Parascaris Paradox": [
+        {
+          question: "In Parascaris, PDE is known to occur during which embryonic stages?",
+          choices: [
+            "2- to 32-cell stages",
+            "4- to 16-cell stages",
+            "8- to 16-cell stages",
+            "16- to 32-cell stages"
+          ],
+          answer: 0,
+          value: 100,
+          explanation: "In Parascaris, PDE occurs from the 2-cell stage up to the 32-cell stage."
+        },
+        {
+          question: "What distinguishes the eliminated DNA of Parascaris from that of Ascaris?",
+          choices: [
+            "Parascaris eliminates only repetitive DNA",
+            "Parascaris eliminates a higher percentage of both genes and repeats",
+            "Parascaris retains all telomeres",
+            "Parascaris does not eliminate any DNA"
+          ],
+          answer: 1,
+          value: 200,
+          explanation: "Parascaris is known to eliminate a greater percentage of its genome, including both genes and repetitive elements."
+        },
+        {
+          question: "Which observation supports the occurrence of PDE in Parascaris?",
+          choices: [
+            "Uniform chromosome structure in somatic cells",
+            "Reduced genome coverage at chromosome ends in somatic cells",
+            "Increased number of centromeres in somatic cells",
+            "No difference between germline and somatic cells"
+          ],
+          answer: 1,
+          value: 300,
+          explanation: "A drop in genome coverage at chromosome ends in somatic cells is a hallmark of PDE in Parascaris."
+        },
+        {
+          question: "In Parascaris, what happens to the eliminated DNA after PDE?",
+          choices: [
+            "It is degraded in the cytoplasm",
+            "It is reincorporated into the genome",
+            "It is used to repair broken chromosomes",
+            "It forms extra-chromosomal circles"
+          ],
+          answer: 0,
+          value: 400,
+          explanation: "Eliminated DNA in Parascaris is sequestered and eventually degraded in the cytoplasm."
+        },
+        {
+          question: "Which sequence correctly represents the life cycle of Parascaris univalens?",
+          choices: [
+            "Egg → Larva (lung migration) → Adult in intestine",
+            "Egg → Adult in intestine → Larva in bloodstream",
+            "Larva → Egg → Adult in muscle",
+            "Egg → Larva (no migration) → Adult"
+          ],
+          answer: 0,
+          value: 500,
+          explanation: "The life cycle of Parascaris univalens follows: eggs are ingested, larvae hatch and migrate (including through the lungs), and mature into adults in the intestine."
+        }
+      ],
+      "C. Elegance": [
+        {
+          question: "How many somatic cells does an adult C. elegans hermaphrodite typically have?",
+          choices: [
+            "302",
+            "558",
+            "959",
+            "1096"
+          ],
+          answer: 2,
+          value: 100,
+          explanation: "An adult C. elegans hermaphrodite has exactly 959 somatic cells."
+        },
+        {
+          question: "Which nematode is the standard model organism for developmental biology?",
+          choices: [
+            "Ascaris",
+            "Oscheius tipulae",
+            "C. elegans",
+            "Parascaris"
+          ],
+          answer: 2,
+          value: 200,
+          explanation: "C. elegans is the standard model for developmental studies in nematodes."
+        },
+        {
+          question: "What is the typical lifespan of C. elegans under laboratory conditions?",
+          choices: [
+            "2-3 days",
+            "7-10 days",
+            "20-30 days",
+            "60-90 days"
+          ],
+          answer: 1,
+          value: 300,
+          explanation: "Under standard laboratory conditions, C. elegans lives for about 7-10 days at 20°C."
+        },
+        {
+          question: "Which gene in C. elegans is key in regulating dauer formation?",
+          choices: [
+            "unc-54",
+            "daf-2",
+            "lin-4",
+            "egl-1"
+          ],
+          answer: 1,
+          value: 400,
+          explanation: "The daf-2 gene, part of the insulin/IGF pathway, is crucial for regulating dauer formation in C. elegans."
+        },
+        {
+          question: "Which sequence best represents the developmental progression (life cycle) of C. elegans?",
+          choices: [
+            "Egg → L1 → L2 → L3 → L4 → Adult",
+            "Egg → L2 → L3 → Adult",
+            "Adult → Egg → Larva → Adult",
+            "Egg → Larva → Pupa → Adult"
+          ],
+          answer: 0,
+          value: 500,
+          explanation: "The typical life cycle of C. elegans follows: Egg, four larval stages (L1 to L4), and then the Adult stage."
+        }
+      ],
+      "Method to the Madness": [
+        {
+          question: "Which sequencing method is particularly effective for assembling complex, repetitive genomes?",
+          choices: [
+            "Illumina short-read sequencing",
+            "PacBio long-read sequencing",
+            "Sanger sequencing",
+            "Nanopore sequencing"
+          ],
+          answer: 1,
+          value: 100,
+          explanation: "PacBio long-read sequencing can span long repeats, making it ideal for assembling complex genomes."
+        },
+        {
+          question: "Which technique is used to study the 3D organization of the genome?",
+          choices: [
+            "RNA-Seq",
+            "ChIP-Seq",
+            "Hi-C",
+            "ATAC-Seq"
+          ],
+          answer: 2,
+          value: 200,
+          explanation: "Hi-C captures chromatin interactions and is used to study the 3D architecture of genomes."
+        },
+        {
+          question: "What does END-seq measure in the context of PDE research?",
+          choices: [
+            "DNA double-strand break resection",
+            "Gene expression levels",
+            "Protein-protein interactions",
+            "DNA methylation patterns"
+          ],
+          answer: 0,
+          value: 300,
+          explanation: "END-seq measures the extent of resection at DNA double-strand break sites."
+        },
+        {
+          question: "Which method is used to visualize telomere locations during PDE?",
+          choices: [
+            "FISH (Fluorescence in situ hybridization)",
+            "Western blotting",
+            "Flow cytometry",
+            "PCR"
+          ],
+          answer: 0,
+          value: 400,
+          explanation: "FISH is used to visually locate telomeres during PDE."
+        },
+        {
+          question: "What is a major advantage of long-read sequencing over short-read methods?",
+          choices: [
+            "Higher throughput",
+            "Better resolution of repetitive regions",
+            "Lower error rates",
+            "Faster run times"
+          ],
+          answer: 1,
+          value: 500,
+          explanation: "Long-read sequencing excels at resolving long repetitive regions that are challenging for short-read technologies."
+        }
+      ],
+      "Research Riddles": [
+        {
+          question: "Which method is commonly used to detect protein-protein interactions on a large scale?",
+          choices: [
+            "Yeast two-hybrid",
+            "Western blot",
+            "RNA-Seq",
+            "ChIP-Seq"
+          ],
+          answer: 0,
+          value: 100,
+          explanation: "Yeast two-hybrid screening is widely employed to identify protein-protein interactions."
+        },
+        {
+          question: "What is the primary purpose of ChIP-Seq?",
+          choices: [
+            "To map protein-DNA interactions",
+            "To sequence RNA",
+            "To measure metabolite levels",
+            "To analyze chromatin accessibility"
+          ],
+          answer: 0,
+          value: 200,
+          explanation: "ChIP-Seq is used to determine where DNA-associated proteins bind across the genome."
+        },
+        {
+          question: "Which technique is best suited for assessing chromatin accessibility genome-wide?",
+          choices: [
+            "ATAC-Seq",
+            "RNA-Seq",
+            "Sanger sequencing",
+            "Mass spectrometry"
+          ],
+          answer: 0,
+          value: 300,
+          explanation: "ATAC-Seq identifies regions of open chromatin across the genome."
+        },
+        {
+          question: "Which method is most appropriate for single-cell transcriptomics?",
+          choices: [
+            "Bulk RNA-Seq",
+            "scRNA-Seq",
+            "ChIP-Seq",
+            "Hi-C"
+          ],
+          answer: 1,
+          value: 400,
+          explanation: "scRNA-Seq allows transcriptome analysis at the single-cell level."
+        },
+        {
+          question: "What is one key advantage of using CRISPR-Cas9 in research?",
+          choices: [
+            "It allows targeted gene editing",
+            "It increases mutation rates randomly",
+            "It silences all genes indiscriminately",
+            "It only works in prokaryotes"
+          ],
+          answer: 0,
+          value: 500,
+          explanation: "CRISPR-Cas9 enables precise, targeted modifications in the genome."
+        }
+      ],
+      "Evo-lution Revolution": [
         {
           question: "PDE may offer an evolutionary advantage by:",
           choices: [
@@ -444,19 +768,19 @@
           ],
           answer: 1,
           value: 100,
-          explanation: "By eliminating germline-specific sequences, PDE streamlines the somatic genome for efficient function."
+          explanation: "By eliminating unnecessary germline-specific sequences, PDE streamlines the somatic genome."
         },
         {
-          question: "Comparative genomics indicates that PDE:",
+          question: "Comparative genomics suggests that PDE:",
           choices: [
             "Evolved in a single lineage",
             "May have evolved independently in different lineages",
-            "Is exclusive to parasitic species",
-            "Does not impact evolution"
+            "Is exclusive to parasitic nematodes",
+            "Does not affect genome evolution"
           ],
           answer: 1,
           value: 200,
-          explanation: "PDE appears to have evolved independently in various groups, demonstrating convergent evolution."
+          explanation: "Evidence indicates that PDE has independently evolved in multiple groups."
         },
         {
           question: "Elimination of certain genes during PDE primarily serves to:",
@@ -468,7 +792,7 @@
           ],
           answer: 0,
           value: 300,
-          explanation: "Removing these genes prevents their expression in somatic cells, which is essential for proper differentiation."
+          explanation: "Removing these genes ensures that they are not inappropriately expressed in somatic cells."
         },
         {
           question: "PDE has been linked to the evolution of:",
@@ -480,10 +804,10 @@
           ],
           answer: 0,
           value: 400,
-          explanation: "PDE aids in resolving fused chromosomes, which refines the karyotype over evolutionary time."
+          explanation: "PDE contributes to resolving fused chromosomes, refining the karyotype over evolutionary time."
         },
         {
-          question: "How might PDE contribute to speciation in nematodes?",
+          question: "How might PDE drive speciation in nematodes?",
           choices: [
             "By generating irreversible genomic changes",
             "By promoting gene flow between populations",
@@ -492,74 +816,12 @@
           ],
           answer: 0,
           value: 500,
-          explanation: "Irreversible genomic changes from PDE can lead to reproductive isolation, fostering speciation."
-        }
-      ],
-      "Data & Interpretation": [
-        {
-          question: "What does the consistent loss of subtelomeric regions during PDE in Ascaris suggest about chromosome evolution?",
-          choices: [
-            "It indicates random genomic degradation",
-            "It reflects an evolutionary mechanism to resolve chromosome fusions",
-            "It is a byproduct of high mutation rates",
-            "It results from experimental error"
-          ],
-          answer: 1,
-          value: 100,
-          explanation: "The loss of subtelomeric regions is thought to be an adaptation to resolve fused chromosomes into independent units."
-        },
-        {
-          question: "How does the observed extensive end resection at DNA break sites inform our understanding of telomere healing?",
-          choices: [
-            "It suggests that telomere healing is error-prone",
-            "It indicates a regulated process distinguishing retained from eliminated DNA",
-            "It implies that resection is irrelevant to healing",
-            "It shows that resection only occurs in germline cells"
-          ],
-          answer: 1,
-          value: 200,
-          explanation: "Extensive resection before telomere addition suggests a controlled mechanism that favors repair of retained DNA."
-        },
-        {
-          question: "In the research data, what is the significance of detecting a fail-safe mechanism with additional DNA breaks during PDE?",
-          choices: [
-            "It increases the chance of complete gene loss",
-            "It ensures that no residual germline-specific DNA remains in somatic cells",
-            "It serves to initiate apoptosis",
-            "It compensates for telomere shortening"
-          ],
-          answer: 1,
-          value: 300,
-          explanation: "The additional breaks act as a fail-safe to ensure that unwanted DNA is fully eliminated from somatic cells."
-        },
-        {
-          question: "What does the differential telomere healing between retained and eliminated DNA imply about the repair mechanisms?",
-          choices: [
-            "Both types of DNA are repaired identically",
-            "A specific repair bias favors healing of retained DNA",
-            "Telomere healing is completely random",
-            "Healing depends solely on DNA sequence context"
-          ],
-          answer: 1,
-          value: 400,
-          explanation: "The data indicate that telomere healing predominantly occurs on retained DNA ends, implying a bias in the repair mechanism."
-        },
-        {
-          question: "Based on the data from Ascaris and O. tipulae, how might PDE contribute to genomic evolution in nematodes?",
-          choices: [
-            "By introducing extensive point mutations",
-            "Through generation of novel somatic chromosomes and resolution of fused chromosomes",
-            "By maintaining a constant genome size",
-            "By increasing the frequency of homologous recombination"
-          ],
-          answer: 1,
-          value: 500,
-          explanation: "PDE reshapes chromosome structure by creating new somatic chromosomes and resolving fusions, thereby driving genomic evolution."
+          explanation: "Irreversible genomic changes due to PDE can lead to reproductive isolation and speciation."
         }
       ]
     };
-    
-    // Final Jeopardy bank (extra hard questions)
+
+    // Final Jeopardy bank (remains unchanged)
     const finalJeopardyBank = [
       {
         question: "Final Jeopardy: Which integrated combination of long-read sequencing and chromatin conformation capture has most advanced our understanding of PDE in nematodes?",
@@ -570,7 +832,7 @@
           "D. Nanopore sequencing and ATAC-Seq"
         ],
         answer: 2,
-        explanation: "The combination of PacBio long-read sequencing with Hi-C has been pivotal in assembling complex genomes and revealing PDE dynamics."
+        explanation: "The combination of PacBio long-read sequencing with Hi-C has been pivotal for assembling complex genomes and revealing PDE dynamics."
       },
       {
         question: "Final Jeopardy: In the context of PDE, what mechanism is primarily responsible for the selective loss of germline-expressed genes?",
@@ -581,7 +843,7 @@
           "D. Unequal chromosomal segregation"
         ],
         answer: 1,
-        explanation: "Selective loss is achieved through targeted DSB formation and subsequent telomere healing, effectively removing specific genes."
+        explanation: "Selective gene loss is achieved through targeted DSB formation and subsequent telomere healing."
       },
       {
         question: "Final Jeopardy: Comparative analysis of PDE in Ascaris versus Oscheius tipulae reveals which key difference in DNA break repair?",
@@ -592,19 +854,10 @@
           "D. Both species use nonhomologous end joining exclusively"
         ],
         answer: 2,
-        explanation: "Ascaris exhibits a bias in repair that favors telomere healing on retained ends, unlike the more uniform healing in O. tipulae."
+        explanation: "Ascaris demonstrates a repair bias that favors telomere healing on retained ends, unlike the more uniform healing observed in Oscheius tipulae."
       }
     ];
-    
-    // Utility: Shuffle an array in place.
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-    
+
     // ---------------- Player Setup Functions ----------------
     function prepareNameInputs(numPlayers) {
       document.getElementById('nameInputs').style.display = 'block';
@@ -634,14 +887,18 @@
     // ---------------- Game Board Initialization ----------------
     function initializeRound() {
       questionsAnswered = 0;
-      // Choose 5 random categories from the full bank.
-      const categories = Object.keys(fullQuestionBank);
-      let chosenCategories = shuffle([...categories]).slice(0, 5);
-      currentCategories = [...chosenCategories]; // store fixed order for this round
+      let currentBank, categories;
+      if (round === 1) {
+        currentBank = round1Bank;
+        categories = round1Categories;
+      } else {
+        currentBank = round2Bank;
+        categories = round2Categories;
+      }
       roundData = {};
-      currentCategories.forEach(cat => {
-        // Create a copy sorted by ascending value (ensuring $100 is at index 0, etc.)
-        roundData[cat] = [...fullQuestionBank[cat]].sort((a, b) => a.value - b.value);
+      categories.forEach(cat => {
+        // Deep copy and sort by ascending value (ensuring $100 at top, $500 at bottom)
+        roundData[cat] = JSON.parse(JSON.stringify(currentBank[cat])).sort((a, b) => a.value - b.value);
         // Apply round multiplier (Round 2 values are doubled).
         roundData[cat].forEach(q => {
           q.originalValue = q.value;
@@ -650,22 +907,22 @@
       });
       // Pick one random Daily Double among the 25 questions.
       const allQuestions = [];
-      currentCategories.forEach(cat => {
+      categories.forEach(cat => {
         roundData[cat].forEach((q, idx) => {
           allQuestions.push({ cat, idx });
         });
       });
       const ddChoice = allQuestions[Math.floor(Math.random() * allQuestions.length)];
       roundData[ddChoice.cat][ddChoice.idx].dailyDouble = true;
-      generateBoard();
+      generateBoard(categories);
     }
     
-    // Generate the game board using currentCategories to fix column order.
-    function generateBoard() {
+    // Generate the game board using the fixed category order.
+    function generateBoard(categories) {
       const gameBoard = document.getElementById('gameBoard');
       gameBoard.innerHTML = "";
-      // Create category headers in the fixed order.
-      currentCategories.forEach(cat => {
+      // Create category headers.
+      categories.forEach(cat => {
         const div = document.createElement('div');
         div.className = 'category';
         div.textContent = cat;
@@ -673,7 +930,7 @@
       });
       // Create 5 rows (for $100, $200, $300, $400, $500).
       for (let i = 0; i < 5; i++) {
-        currentCategories.forEach(cat => {
+        categories.forEach(cat => {
           const qData = roundData[cat][i];
           const cell = document.createElement('div');
           cell.className = 'question';
