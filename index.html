@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DNA Elimination Jeopardy</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f8ff;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background: #003366;
+      color: #fff;
+      padding: 20px;
+    }
+    #gameBoard {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      max-width: 900px;
+      margin: 20px auto;
+    }
+    .category, .question {
+      background: #007acc;
+      color: #fff;
+      padding: 15px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+    .category:hover, .question:hover {
+      background: #005999;
+    }
+    .category {
+      font-weight: bold;
+      cursor: default;
+    }
+    #scoreBoard {
+      max-width: 600px;
+      margin: 20px auto;
+      display: flex;
+      justify-content: space-around;
+    }
+    .playerScore {
+      background: #e0e0e0;
+      padding: 10px;
+      border-radius: 5px;
+      width: 30%;
+    }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background: rgba(0,0,0,0.6);
+    }
+    .modal-content {
+      background: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      max-width: 600px;
+      border-radius: 5px;
+      text-align: left;
+    }
+    .choice {
+      margin: 10px 0;
+      padding: 10px;
+      background: #f0f0f0;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .choice:hover {
+      background: #ddd;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DNA Elimination Jeopardy</h1>
+    <p>A game based on research papers about programmed DNA elimination</p>
+  </header>
+  
+  <section id="playerSetup">
+    <h2>Player Setup</h2>
+    <p>Select number of players:</p>
+    <button onclick="startGame(1)">1 Player</button>
+    <button onclick="startGame(2)">2 Players</button>
+    <button onclick="startGame(3)">3 Players</button>
+  </section>
+  
+  <section id="scoreBoard" style="display:none;"></section>
+  
+  <section id="gameBoard" style="display:none;"></section>
+  
+  <!-- Modal for questions -->
+  <div id="questionModal" class="modal">
+    <div class="modal-content">
+      <h2 id="questionText"></h2>
+      <div id="choices"></div>
+      <p id="feedback" style="font-weight:bold;"></p>
+      <button onclick="closeModal()">Continue</button>
+    </div>
+  </div>
+  
+  <script>
+    // Sample data: categories, questions, and multiple choice answers.
+    // In a production version, you can expand this bank.
+    const gameData = {
+      "DNA Elimination Basics": [
+        {
+          question: "What is the primary function of programmed DNA elimination in nematodes?",
+          choices: ["A. To repair mutations", "B. To permanently silence germline genes", "C. To initiate cell division", "D. To elongate telomeres"],
+          answer: 1,
+          value: 100
+        },
+        {
+          question: "Which statement best describes DNA elimination?",
+          choices: ["A. It occurs randomly", "B. It is a highly reproducible process", "C. It increases genome size", "D. It occurs in all cells"],
+          answer: 1,
+          value: 200
+        }
+      ],
+      "Ascaris": [
+        {
+          question: "During programmed DNA elimination in Ascaris, what happens at the chromosome ends?",
+          choices: ["A. They are elongated", "B. They are completely retained", "C. They undergo DNA breaks and de novo telomere healing", "D. They fuse together"],
+          answer: 2,
+          value: 100
+        },
+        {
+          question: "Approximately how many germline-expressed genes are eliminated in Ascaris?",
+          choices: ["A. 100", "B. 500", "C. 1000", "D. 2000"],
+          answer: 2,
+          value: 200
+        }
+      ],
+      "Oscheius tipulae": [
+        {
+          question: "What conserved motif is required for DNA break during PDE in Oscheius tipulae?",
+          choices: ["A. TATA box", "B. SFE (Sequence For Elimination)", "C. Poly-A tail", "D. CpG island"],
+          answer: 1,
+          value: 100
+        },
+        {
+          question: "Oscheius tipulae is considered a good genetic model for PDE because:",
+          choices: ["A. It has a large genome", "B. It has a short life cycle and is genetically tractable", "C. It is parasitic", "D. It does not eliminate any DNA"],
+          answer: 1,
+          value: 200
+        }
+      ],
+      "Telomere Healing": [
+        {
+          question: "What process restores the broken chromosome ends during DNA elimination in nematodes?",
+          choices: ["A. DNA replication", "B. Nonhomologous end joining", "C. De novo telomere addition", "D. Homologous recombination"],
+          answer: 2,
+          value: 100
+        },
+        {
+          question: "In Ascaris, telomere healing is biased towards:",
+          choices: ["A. Eliminated DSB ends", "B. Retained DSB ends", "C. Both equally", "D. None of the above"],
+          answer: 1,
+          value: 200
+        }
+      ],
+      "Evolution & Function": [
+        {
+          question: "Programmed DNA elimination is thought to contribute to:",
+          choices: ["A. Increased mutation rates", "B. Genome stability and evolution", "C. Viral infection", "D. Uncontrolled cell growth"],
+          answer: 1,
+          value: 100
+        },
+        {
+          question: "Comparative genomics of PDE suggests that:",
+          choices: ["A. All nematodes eliminate the same sequences", "B. PDE may have evolved independently in different lineages", "C. PDE only occurs in parasitic species", "D. PDE does not affect evolution"],
+          answer: 1,
+          value: 200
+        }
+      ]
+    };
+    
+    let players = [];
+    let currentPlayer = 0;
+    let boardData = []; // to track which questions remain
+    
+    function startGame(numPlayers) {
+      // Set up player scores
+      players = [];
+      for (let i = 1; i <= numPlayers; i++) {
+        players.push({ name: "Player " + i, score: 0 });
+      }
+      document.getElementById('playerSetup').style.display = 'none';
+      displayScoreBoard();
+      setupBoard();
+    }
+    
+    function displayScoreBoard() {
+      const scoreBoard = document.getElementById('scoreBoard');
+      scoreBoard.innerHTML = "";
+      players.forEach((player, index) => {
+        const div = document.createElement('div');
+        div.className = 'playerScore';
+        div.id = 'player' + index;
+        div.innerHTML = `<h3>${player.name}</h3><p>Score: <span id="score${index}">${player.score}</span></p>`;
+        scoreBoard.appendChild(div);
+      });
+      scoreBoard.style.display = 'flex';
+    }
+    
+    function setupBoard() {
+      boardData = JSON.parse(JSON.stringify(gameData)); // deep copy
+      const gameBoard = document.getElementById('gameBoard');
+      gameBoard.innerHTML = "";
+      
+      // First row: category headers
+      Object.keys(boardData).forEach(category => {
+        const div = document.createElement('div');
+        div.className = 'category';
+        div.textContent = category;
+        gameBoard.appendChild(div);
+      });
+      
+      // Assume each category has same number of questions
+      const numQuestions = boardData[Object.keys(boardData)[0]].length;
+      for (let i = 0; i < numQuestions; i++) {
+        Object.keys(boardData).forEach(category => {
+          const qData = boardData[category][i];
+          const div = document.createElement('div');
+          div.className = 'question';
+          div.textContent = "$" + qData.value;
+          div.onclick = function() { openQuestion(category, i); };
+          gameBoard.appendChild(div);
+        });
+      }
+      gameBoard.style.display = 'grid';
+    }
+    
+    function openQuestion(category, index) {
+      // If question already answered, do nothing
+      if (!boardData[category] || !boardData[category][index]) return;
+      
+      const qData = boardData[category][index];
+      document.getElementById('questionText').textContent = qData.question;
+      const choicesDiv = document.getElementById('choices');
+      choicesDiv.innerHTML = "";
+      qData.choices.forEach((choice, idx) => {
+        const p = document.createElement('p');
+        p.className = 'choice';
+        p.textContent = choice;
+        p.onclick = function() { checkAnswer(category, index, idx); };
+        choicesDiv.appendChild(p);
+      });
+      document.getElementById('feedback').textContent = "";
+      document.getElementById('questionModal').style.display = 'block';
+    }
+    
+    function checkAnswer(category, index, selected) {
+      const qData = boardData[category][index];
+      const feedback = document.getElementById('feedback');
+      if (selected === qData.answer) {
+        feedback.textContent = "Correct!";
+        players[currentPlayer].score += qData.value;
+      } else {
+        feedback.textContent = "Incorrect. The correct answer was: " + qData.choices[qData.answer];
+        // Optionally subtract points here if desired.
+      }
+      // Update score board for current player
+      document.getElementById('score' + currentPlayer).textContent = players[currentPlayer].score;
+      // Mark the question as answered
+      delete boardData[category][index];
+      // Rotate player turn if more than one player
+      if (players.length > 1) {
+        currentPlayer = (currentPlayer + 1) % players.length;
+      }
+    }
+    
+    function closeModal() {
+      document.getElementById('questionModal').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
