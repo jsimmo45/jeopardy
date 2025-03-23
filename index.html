@@ -209,7 +209,7 @@
     let questionBank = null;
 
     // Fetch the question bank JSON from the external file.
-    fetch('./question_bank.json')
+    fetch('question_bank.json')
       .then(response => {
         console.log("Fetch response status:", response.status);
         return response.json();
