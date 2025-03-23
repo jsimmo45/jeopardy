@@ -19,13 +19,6 @@
       padding: 30px;
       font-size: 2.5em;
     }
-    /* Controls container */
-    #controls {
-      max-width: 1200px;
-      margin: 10px auto;
-      text-align: right;
-      padding: 0 20px;
-    }
     /* Enlarged game board */
     #gameBoard {
       display: grid;
@@ -90,6 +83,15 @@
       font-size: 1em;
       cursor: pointer;
     }
+    /* Initially disable Start Game buttons */
+    .start-btn {
+      cursor: not-allowed;
+    }
+    /* Loading message */
+    #loadingMsg {
+      font-size: 1.4em;
+      color: #333;
+    }
     /* Modal styles */
     .modal {
       display: none;
@@ -144,10 +146,11 @@
   <!-- Player Setup Section -->
   <section id="playerSetup">
     <h2>Player Setup</h2>
+    <p id="loadingMsg">Loading question bank… Please wait.</p>
     <p>Select number of players:</p>
-    <button onclick="prepareNameInputs(1)">1 Player</button>
-    <button onclick="prepareNameInputs(2)">2 Players</button>
-    <button onclick="prepareNameInputs(3)">3 Players</button>
+    <button id="btn1" class="start-btn" disabled onclick="prepareNameInputs(1)">1 Player</button>
+    <button id="btn2" class="start-btn" disabled onclick="prepareNameInputs(2)">2 Players</button>
+    <button id="btn3" class="start-btn" disabled onclick="prepareNameInputs(3)">3 Players</button>
     <div id="nameInputs" style="display:none;"></div>
   </section>
   
@@ -208,15 +211,21 @@
     // Fetch the question bank JSON from the external file.
     fetch('question_bank.json')
       .then(response => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok " + response.statusText);
-       }
+        console.log("Fetch response status:", response.status);
         return response.json();
       })
       .then(data => {
         questionBank = data;
-        console.log("Question bank loaded successfully.");
-        // Optionally enable the Start Game button here.
+        console.log("Question bank loaded successfully:", questionBank);
+        // Remove loading message and enable Start Game buttons.
+        document.getElementById('loadingMsg').style.display = 'none';
+        document.getElementById('btn1').disabled = false;
+        document.getElementById('btn2').disabled = false;
+        document.getElementById('btn3').disabled = false;
+        // Remove disabled style class.
+        document.getElementById('btn1').classList.remove('start-btn');
+        document.getElementById('btn2').classList.remove('start-btn');
+        document.getElementById('btn3').classList.remove('start-btn');
       })
       .catch(error => console.error('Error loading question bank:', error));
 
@@ -243,7 +252,6 @@
       document.getElementById('playerSetup').style.display = 'none';
       displayScoreBoard();
       document.getElementById('controls').style.display = 'block';
-      // Initialize Round 1 after questionBank is loaded.
       if (questionBank) {
         initializeRoundFromBank('round1', round1Categories);
       } else {
@@ -264,9 +272,8 @@
           return;
         }
         let selected = shuffle([...allQuestions]).slice(0, 5);
-        // Sort selected questions by ascending value so that the top cell is $100 and bottom is $500.
+        // Sort selected questions by ascending value so top cell is $100 and bottom is $500.
         selected.sort((a, b) => a.value - b.value);
-        // For Round 2, double the values.
         selected.forEach(q => {
           q.originalValue = q.value;
           q.value = q.value * (round === 1 ? 1 : 2);
@@ -289,14 +296,12 @@
     function generateBoard(categories) {
       const gameBoard = document.getElementById('gameBoard');
       gameBoard.innerHTML = "";
-      // Create category headers in fixed order.
       categories.forEach(cat => {
         let div = document.createElement('div');
         div.className = 'category';
         div.textContent = cat;
         gameBoard.appendChild(div);
       });
-      // Create 5 rows (one for each question value).
       for (let i = 0; i < 5; i++) {
         categories.forEach(cat => {
           let qData = roundData[cat][i];
@@ -345,7 +350,6 @@
         alert("Question bank not loaded yet. Please wait.");
         return;
       }
-      // If currently in Round 1, move to Round 2; if in Round 2, skip to Final Jeopardy.
       if (round === 1) {
         round = 2;
         alert("Skipping to Double Jeopardy (Round 2).");
@@ -371,7 +375,6 @@
       document.getElementById('feedback').innerHTML = "";
       document.getElementById('confirmButton').style.display = 'none';
       
-      // If Daily Double, prompt for wager.
       if (currentQuestion.dailyDouble) {
         const maxWager = players[currentPlayer].score > 0 ? players[currentPlayer].score : 1000;
         let wagerDiv = document.createElement('div');
