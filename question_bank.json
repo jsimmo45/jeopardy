@@ -1,0 +1,734 @@
+{
+  "round1": {
+    "Elimin-8 or Not": [
+      {
+        "question": "What is the primary role of programmed DNA elimination (PDE) in nematodes?",
+        "choices": [
+          "To remove germline‐specific sequences",
+          "To repair damaged DNA",
+          "To duplicate chromosomes",
+          "To stimulate cell division"
+        ],
+        "answer": 0,
+        "value": 100,
+        "explanation": "PDE removes germline-specific sequences from somatic cells, ensuring permanent gene silencing."
+      },
+      {
+        "question": "Which statement best describes PDE?",
+        "choices": [
+          "It is a random DNA loss process",
+          "It is a highly reproducible mechanism",
+          "It increases mutation rates",
+          "It duplicates the genome"
+        ],
+        "answer": 1,
+        "value": 200,
+        "explanation": "PDE is tightly regulated so that the same sequences are consistently eliminated every time."
+      },
+      {
+        "question": "Approximately what percentage of individual animals on Earth are estimated to be nematodes?",
+        "choices": [
+          "10%",
+          "30%",
+          "50%",
+          "80%"
+        ],
+        "answer": 3,
+        "value": 300,
+        "explanation": "Studies suggest that nematodes can comprise up to 80% of all individual animals."
+      },
+      {
+        "question": "Which type of genes are most often eliminated during PDE?",
+        "choices": [
+          "Housekeeping genes",
+          "Germline-expressed genes",
+          "Ribosomal RNA genes",
+          "Metabolic genes"
+        ],
+        "answer": 1,
+        "value": 400,
+        "explanation": "Germline-expressed genes are selectively removed from somatic cells to prevent their expression outside the germline."
+      },
+      {
+        "question": "Which of the following correctly represents the life cycle of Ascaris lumbricoides?",
+        "choices": [
+          "Egg → Larva (lung migration) → Adult in intestine",
+          "Egg → Adult in intestine → Larva in bloodstream",
+          "Larva → Egg → Adult in muscle",
+          "Adult in intestine → Egg → Larva in soil"
+        ],
+        "answer": 0,
+        "value": 500,
+        "explanation": "Ascaris lumbricoides follows the life cycle: ingestion of eggs, hatching into larvae (with lung migration), then maturation into adults in the intestine."
+      }
+      // ... (at least 10 questions total per category)
+    ],
+    "Ascari-ology": [
+      {
+        "question": "In Ascaris, what happens to chromosome ends during PDE?",
+        "choices": [
+          "They are elongated",
+          "They are methylated",
+          "They are broken and re‐healed with new telomeres",
+          "They fuse with other chromosomes"
+        ],
+        "answer": 2,
+        "value": 100,
+        "explanation": "In Ascaris, chromosome ends are broken and then re‐capped by de novo telomere addition."
+      },
+      {
+        "question": "Approximately how many germline‐expressed genes are eliminated in Ascaris?",
+        "choices": [
+          "Around 100",
+          "About 500",
+          "Approximately 1000",
+          "Over 2000"
+        ],
+        "answer": 2,
+        "value": 200,
+        "explanation": "Genomic studies estimate that roughly 1000 germline‐expressed genes are eliminated during PDE in Ascaris."
+      },
+      {
+        "question": "Which genomic technique was pivotal for assembling the complete Ascaris genome?",
+        "choices": [
+          "Sanger sequencing",
+          "PacBio long-read sequencing with Hi-C",
+          "RNA-Seq",
+          "Microarray analysis"
+        ],
+        "answer": 1,
+        "value": 300,
+        "explanation": "The combination of PacBio long-read sequencing with Hi-C data allowed researchers to assemble full-length Ascaris chromosomes."
+      },
+      {
+        "question": "Which of the following best describes a key aspect of the Ascaris life cycle?",
+        "choices": [
+          "Egg → Larva (lung migration) → Adult in intestine",
+          "Egg → Adult in intestine → Larva in bloodstream",
+          "Larva → Egg → Adult in muscle",
+          "Adult in intestine → Egg → Larva in soil"
+        ],
+        "answer": 0,
+        "value": 400,
+        "explanation": "Ascaris follows a life cycle where ingested eggs hatch into larvae that migrate (including via the lungs) and mature into adults in the intestine."
+      },
+      {
+        "question": "Which chromosome characteristic is used to explain PDE in Ascaris?",
+        "choices": [
+          "Monocentricity",
+          "Holocentricity",
+          "Acrocentricity",
+          "Telocentricity"
+        ],
+        "answer": 1,
+        "value": 500,
+        "explanation": "Ascaris chromosomes are holocentric, and changes in centromere protein (CENP-A) distribution help determine which regions are eliminated."
+      }
+      // ... (at least 10 questions total)
+    ],
+    "Oscheius Underfoot": [
+      {
+        "question": "In Oscheius tipulae, which conserved motif directs DNA breaks during PDE?",
+        "choices": [
+          "TATA box",
+          "SFE (Sequence For Elimination)",
+          "CAAT box",
+          "Poly-A signal"
+        ],
+        "answer": 1,
+        "value": 100,
+        "explanation": "The SFE motif is essential for specifying where DNA breaks occur during PDE in Oscheius tipulae."
+      },
+      {
+        "question": "At which embryonic stage is PDE observed in Oscheius tipulae?",
+        "choices": [
+          "2-cell stage",
+          "4-cell stage",
+          "8- to 16-cell stage",
+          "Larval stage"
+        ],
+        "answer": 2,
+        "value": 200,
+        "explanation": "PDE in Oscheius tipulae occurs during the 8- to 16-cell stage."
+      },
+      {
+        "question": "Which statement best describes the life cycle of Oscheius tipulae?",
+        "choices": [
+          "It is a free-living nematode with a rapid soil-based life cycle",
+          "It is parasitic with a complex host-associated life cycle",
+          "It has an extended life cycle spanning several months",
+          "It alternates between free-living and parasitic phases"
+        ],
+        "answer": 0,
+        "value": 300,
+        "explanation": "Oscheius tipulae is a free-living nematode that completes its life cycle quickly in soil."
+      },
+      {
+        "question": "What chromosomal structure is typical of Oscheius tipulae?",
+        "choices": [
+          "Monocentric chromosomes",
+          "Holocentric chromosomes",
+          "Telocentric chromosomes",
+          "Submetacentric chromosomes"
+        ],
+        "answer": 1,
+        "value": 400,
+        "explanation": "Like many nematodes, Oscheius tipulae possesses holocentric chromosomes."
+      },
+      {
+        "question": "Which process in Oscheius tipulae ensures proper chromosome segregation during PDE?",
+        "choices": [
+          "Uniform CENP-A distribution throughout the chromosome",
+          "Differential CENP-A localization leading to selective retention",
+          "Random chromosomal breakage without regulation",
+          "Enhanced telomere elongation"
+        ],
+        "answer": 1,
+        "value": 500,
+        "explanation": "Differential CENP-A localization on Oscheius chromosomes plays a role in determining which parts are retained or eliminated."
+      }
+      // ... (at least 10 questions total)
+    ],
+    "Telomere Time": [
+      {
+        "question": "What process restores broken chromosome ends during PDE in nematodes?",
+        "choices": [
+          "Homologous recombination",
+          "Nonhomologous end joining",
+          "De novo telomere addition",
+          "DNA methylation"
+        ],
+        "answer": 2,
+        "value": 100,
+        "explanation": "Broken ends are restored by de novo telomere addition, which is crucial during PDE."
+      },
+      {
+        "question": "In Ascaris, telomere healing preferentially occurs on which DNA ends?",
+        "choices": [
+          "Retained ends",
+          "Eliminated ends",
+          "Both equally",
+          "Neither"
+        ],
+        "answer": 0,
+        "value": 200,
+        "explanation": "Telomere healing in Ascaris predominantly occurs on the retained DNA ends."
+      },
+      {
+        "question": "Which enzyme is central to the telomere addition process?",
+        "choices": [
+          "DNA polymerase",
+          "Telomerase",
+          "Ligase",
+          "Helicase"
+        ],
+        "answer": 1,
+        "value": 300,
+        "explanation": "Telomerase is responsible for adding telomeric repeats to broken chromosome ends."
+      },
+      {
+        "question": "How does the extent of end resection differ between retained and eliminated ends in Ascaris?",
+        "choices": [
+          "Retained ends are more resected",
+          "Eliminated ends are more resected",
+          "Both are resected equally",
+          "Neither undergoes resection"
+        ],
+        "answer": 1,
+        "value": 400,
+        "explanation": "Eliminated ends undergo more extensive resection, affecting telomere healing."
+      },
+      {
+        "question": "Which technique is used to map de novo telomere addition sites?",
+        "choices": [
+          "END-seq",
+          "RNA-Seq",
+          "ChIP-Seq",
+          "ATAC-Seq"
+        ],
+        "answer": 0,
+        "value": 500,
+        "explanation": "END-seq is employed to precisely map the locations of new telomere addition after DNA breaks."
+      }
+      // ... (at least 10 questions total)
+    ],
+    "Data Dilemma": [
+      {
+        "question": "Approximately what percentage of all individual animals on Earth are estimated to be nematodes?",
+        "choices": [
+          "10%",
+          "30%",
+          "50%",
+          "80%"
+        ],
+        "answer": 3,
+        "value": 100,
+        "explanation": "Estimates suggest that nematodes make up around 80% of all individual animals on Earth."
+      },
+      {
+        "question": "What does the consistent loss of subtelomeric regions during PDE in Ascaris suggest?",
+        "choices": [
+          "Random genomic degradation",
+          "An evolutionary mechanism to resolve chromosome fusions",
+          "A byproduct of high mutation rates",
+          "Experimental error"
+        ],
+        "answer": 1,
+        "value": 200,
+        "explanation": "The loss of subtelomeric regions is thought to help resolve chromosome fusions evolutionarily."
+      },
+      {
+        "question": "How does extensive end resection at DNA break sites inform our understanding of telomere healing?",
+        "choices": [
+          "It suggests telomere healing is error-prone",
+          "It indicates a regulated process distinguishing retained from eliminated DNA",
+          "It implies resection is irrelevant",
+          "It occurs only in germline cells"
+        ],
+        "answer": 1,
+        "value": 300,
+        "explanation": "Extensive resection implies a controlled repair mechanism that favors healing of retained DNA."
+      },
+      {
+        "question": "What role do small RNAs play in regulating gene expression during PDE?",
+        "choices": [
+          "They stimulate random mutations",
+          "They silence repetitive sequences and specific genes",
+          "They promote chromosome fusion",
+          "They activate all germline genes"
+        ],
+        "answer": 1,
+        "value": 400,
+        "explanation": "Small RNAs help silence repetitive elements and germline-specific genes during PDE."
+      },
+      {
+        "question": "Which chromatin modification is typically reduced in regions that will be eliminated during PDE?",
+        "choices": [
+          "H3K9me3",
+          "CENP-A deposition",
+          "H3K4me3",
+          "Acetylation"
+        ],
+        "answer": 1,
+        "value": 500,
+        "explanation": "Reduced CENP-A deposition in specific chromosomal regions marks them for elimination during PDE."
+      }
+      // ... (at least 10 questions total)
+    ]
+  },
+  "round2": {
+    "Parascaris Paradox": [
+      {
+        "question": "In Parascaris, during which embryonic stages is PDE observed?",
+        "choices": [
+          "2- to 32-cell stages",
+          "4- to 16-cell stages",
+          "8- to 16-cell stages",
+          "16- to 32-cell stages"
+        ],
+        "answer": 0,
+        "value": 100,
+        "explanation": "In Parascaris, PDE is observed from the 2-cell stage up to the 32-cell stage."
+      },
+      {
+        "question": "What distinguishes the eliminated DNA of Parascaris from that of Ascaris?",
+        "choices": [
+          "Parascaris eliminates only repetitive DNA",
+          "Parascaris eliminates a higher percentage of both genes and repeats",
+          "Parascaris retains all telomeres",
+          "Parascaris does not eliminate any DNA"
+        ],
+        "answer": 1,
+        "value": 200,
+        "explanation": "Parascaris eliminates a larger fraction of its genome, including both genes and repeats."
+      },
+      {
+        "question": "Which observation supports the occurrence of PDE in Parascaris?",
+        "choices": [
+          "Uniform chromosome structure in somatic cells",
+          "Reduced genome coverage at chromosome ends in somatic cells",
+          "Increased number of centromeres in somatic cells",
+          "No difference between germline and somatic cells"
+        ],
+        "answer": 1,
+        "value": 300,
+        "explanation": "A drop in genome coverage at chromosome ends is indicative of PDE in Parascaris."
+      },
+      {
+        "question": "What happens to the eliminated DNA in Parascaris after PDE?",
+        "choices": [
+          "It is degraded in the cytoplasm",
+          "It is reincorporated into the genome",
+          "It is used to repair chromosomes",
+          "It forms extra-chromosomal circles"
+        ],
+        "answer": 0,
+        "value": 400,
+        "explanation": "Eliminated DNA in Parascaris is sequestered and degraded in the cytoplasm."
+      },
+      {
+        "question": "Which sequence best represents the life cycle of Parascaris univalens?",
+        "choices": [
+          "Egg → Larva (lung migration) → Adult in intestine",
+          "Egg → Adult in intestine → Larva in bloodstream",
+          "Larva → Egg → Adult in muscle",
+          "Egg → Larva (no migration) → Adult"
+        ],
+        "answer": 0,
+        "value": 500,
+        "explanation": "Parascaris univalens follows a life cycle with larval migration (including lung migration) before maturing into an adult in the intestine."
+      }
+      // ... (at least 10 questions total)
+    ],
+    "C. Elegance": [
+      {
+        "question": "How many somatic cells does an adult C. elegans hermaphrodite have?",
+        "choices": [
+          "302",
+          "558",
+          "959",
+          "1096"
+        ],
+        "answer": 2,
+        "value": 100,
+        "explanation": "An adult C. elegans hermaphrodite has exactly 959 somatic cells."
+      },
+      {
+        "question": "Which of the following best describes C. elegans chromosomes?",
+        "choices": [
+          "Monocentric",
+          "Holocentric",
+          "Telocentric",
+          "Acrocentric"
+        ],
+        "answer": 1,
+        "value": 200,
+        "explanation": "C. elegans chromosomes are holocentric, with kinetochore activity distributed along their entire length."
+      },
+      {
+        "question": "Which developmental process is unique to C. elegans?",
+        "choices": [
+          "Metamorphosis",
+          "Dauer formation",
+          "Complete metamorphosis",
+          "Pupation"
+        ],
+        "answer": 1,
+        "value": 300,
+        "explanation": "Dauer formation is a unique developmental adaptation in C. elegans in response to harsh conditions."
+      },
+      {
+        "question": "Which gene is crucial for the regulation of dauer formation in C. elegans?",
+        "choices": [
+          "unc-54",
+          "daf-2",
+          "lin-4",
+          "egl-1"
+        ],
+        "answer": 1,
+        "value": 400,
+        "explanation": "The daf-2 gene plays a central role in the insulin/IGF signaling pathway regulating dauer formation in C. elegans."
+      },
+      {
+        "question": "Which aspect of C. elegans developmental biology is reflected in its fixed cell lineage?",
+        "choices": [
+          "Random cell fate determination",
+          "Invariant cell divisions",
+          "Asymmetric cell division only in the germline",
+          "Plastic cell fate"
+        ],
+        "answer": 1,
+        "value": 500,
+        "explanation": "C. elegans is known for its invariant, fixed cell lineage, where each cell's fate is predetermined."
+      }
+      // ... (at least 10 questions total)
+    ],
+    "Method to the Madness": [
+      {
+        "question": "Which sequencing method is most effective for assembling repetitive genomes?",
+        "choices": [
+          "Illumina short-read sequencing",
+          "PacBio long-read sequencing",
+          "Sanger sequencing",
+          "Nanopore sequencing"
+        ],
+        "answer": 1,
+        "value": 100,
+        "explanation": "PacBio long-read sequencing is well-suited for spanning and resolving repetitive regions."
+      },
+      {
+        "question": "Which technique captures the 3D structure of chromosomes?",
+        "choices": [
+          "RNA-Seq",
+          "ChIP-Seq",
+          "Hi-C",
+          "ATAC-Seq"
+        ],
+        "answer": 2,
+        "value": 200,
+        "explanation": "Hi-C is used to study chromatin interactions and the 3D organization of the genome."
+      },
+      {
+        "question": "What does END-seq measure in the context of PDE research?",
+        "choices": [
+          "Extent of DNA double-strand break resection",
+          "Gene expression levels",
+          "Protein-protein interactions",
+          "Chromatin accessibility"
+        ],
+        "answer": 0,
+        "value": 300,
+        "explanation": "END-seq is used to quantify the extent of DNA resection at double-strand break sites."
+      },
+      {
+        "question": "Which method visualizes telomere locations during PDE?",
+        "choices": [
+          "FISH",
+          "Western blotting",
+          "Flow cytometry",
+          "PCR"
+        ],
+        "answer": 0,
+        "value": 400,
+        "explanation": "Fluorescence in situ hybridization (FISH) is used to locate telomeres during PDE."
+      },
+      {
+        "question": "What is a major advantage of long-read sequencing over short-read methods?",
+        "choices": [
+          "Higher throughput",
+          "Better resolution of repetitive regions",
+          "Lower error rates",
+          "Faster run times"
+        ],
+        "answer": 1,
+        "value": 500,
+        "explanation": "Long-read sequencing excels at resolving long, repetitive regions that short-read methods cannot span."
+      }
+      // ... (at least 10 questions total)
+    ],
+    "Research Riddles": [
+      {
+        "question": "Which method is commonly used for large-scale detection of protein-protein interactions?",
+        "choices": [
+          "Yeast two-hybrid",
+          "Western blot",
+          "RNA-Seq",
+          "ChIP-Seq"
+        ],
+        "answer": 0,
+        "value": 100,
+        "explanation": "Yeast two-hybrid screening is widely used to detect protein-protein interactions."
+      },
+      {
+        "question": "What is the primary purpose of ChIP-Seq?",
+        "choices": [
+          "To map protein-DNA interactions",
+          "To sequence RNA",
+          "To measure metabolites",
+          "To analyze chromatin accessibility"
+        ],
+        "answer": 0,
+        "value": 200,
+        "explanation": "ChIP-Seq is used to identify the binding sites of DNA-associated proteins."
+      },
+      {
+        "question": "Which technique is best for assessing genome-wide chromatin accessibility?",
+        "choices": [
+          "ATAC-Seq",
+          "RNA-Seq",
+          "Sanger sequencing",
+          "Mass spectrometry"
+        ],
+        "answer": 0,
+        "value": 300,
+        "explanation": "ATAC-Seq provides a genome-wide profile of open chromatin regions."
+      },
+      {
+        "question": "Which method is appropriate for single-cell transcriptomics?",
+        "choices": [
+          "Bulk RNA-Seq",
+          "scRNA-Seq",
+          "ChIP-Seq",
+          "Hi-C"
+        ],
+        "answer": 1,
+        "value": 400,
+        "explanation": "Single-cell RNA-Seq (scRNA-Seq) allows analysis of transcriptomes at the single-cell level."
+      },
+      {
+        "question": "What advantage does CRISPR-Cas9 offer in genetic research?",
+        "choices": [
+          "Targeted gene editing",
+          "Random mutation induction",
+          "Global gene silencing",
+          "Universal gene activation"
+        ],
+        "answer": 0,
+        "value": 500,
+        "explanation": "CRISPR-Cas9 enables precise, targeted modifications in the genome."
+      }
+      // ... (at least 10 questions total)
+    ],
+    "Evo-lution Revolution": [
+      {
+        "question": "PDE may offer an evolutionary advantage by:",
+        "choices": [
+          "Increasing genome size",
+          "Removing harmful germline-specific sequences",
+          "Enhancing mutation rates",
+          "Stimulating cell proliferation"
+        ],
+        "answer": 1,
+        "value": 100,
+        "explanation": "Eliminating unnecessary germline-specific sequences streamlines the somatic genome for efficient function."
+      },
+      {
+        "question": "Comparative genomics suggests that PDE:",
+        "choices": [
+          "Evolved in a single lineage",
+          "May have evolved independently in different lineages",
+          "Is exclusive to parasitic nematodes",
+          "Does not affect genome evolution"
+        ],
+        "answer": 1,
+        "value": 200,
+        "explanation": "Evidence shows that PDE has independently evolved in multiple nematode groups."
+      },
+      {
+        "question": "Elimination of certain genes during PDE primarily serves to:",
+        "choices": [
+          "Prevent their expression in somatic cells",
+          "Increase genetic diversity",
+          "Enhance cell growth",
+          "Trigger DNA repair mechanisms"
+        ],
+        "answer": 0,
+        "value": 300,
+        "explanation": "Removing these genes ensures that they are not inappropriately expressed in somatic tissues."
+      },
+      {
+        "question": "What role do Nigon elements play in nematode chromosome evolution?",
+        "choices": [
+          "They are transient repeats with no evolutionary significance",
+          "They are conserved chromosomal building blocks that define karyotypes",
+          "They cause random chromosomal breakage",
+          "They only exist in parasitic nematodes"
+        ],
+        "answer": 1,
+        "value": 400,
+        "explanation": "Nigon elements are ancestral chromosomal segments conserved across nematodes and are key to understanding karyotype evolution."
+      },
+      {
+        "question": "How might PDE drive speciation in nematodes?",
+        "choices": [
+          "By generating irreversible genomic changes",
+          "By promoting gene flow between populations",
+          "By conserving ancestral gene order",
+          "By increasing horizontal gene transfer"
+        ],
+        "answer": 0,
+        "value": 500,
+        "explanation": "Irreversible genomic changes due to PDE can lead to reproductive isolation and eventually speciation."
+      }
+      // ... (at least 10 questions total)
+    ],
+    "Nigon Nuances": [
+      {
+        "question": "What are Nigon elements in the context of nematode genomics?",
+        "choices": [
+          "Random repetitive sequences",
+          "Conserved chromosomal segments that form the basis of nematode karyotypes",
+          "Unique to parasitic nematodes",
+          "Fragments produced by PDE"
+        ],
+        "answer": 1,
+        "value": 100,
+        "explanation": "Nigon elements are conserved chromosomal segments that have been maintained through nematode evolution."
+      },
+      {
+        "question": "How many Nigon elements have been identified in C. elegans?",
+        "choices": [
+          "5",
+          "6",
+          "7",
+          "8"
+        ],
+        "answer": 2,
+        "value": 200,
+        "explanation": "C. elegans is thought to have 7 Nigon elements, which are used as a framework for understanding its chromosome structure."
+      },
+      {
+        "question": "Which nematode(s) have shown evidence of conservation of Nigon elements?",
+        "choices": [
+          "Only C. elegans",
+          "C. elegans and Oscheius tipulae",
+          "C. elegans, Oscheius tipulae, and Ascaris/Parascaris",
+          "None of the above"
+        ],
+        "answer": 2,
+        "value": 300,
+        "explanation": "Studies indicate that Nigon elements are conserved across diverse nematodes including C. elegans, Oscheius tipulae, and Ascaris/Parascaris."
+      },
+      {
+        "question": "What role do Nigon elements play in chromosome evolution?",
+        "choices": [
+          "They are involved in genome duplication",
+          "They serve as evolutionary conserved building blocks that can be reshuffled during evolution",
+          "They are responsible for telomere elongation",
+          "They determine the rate of mutation"
+        ],
+        "answer": 1,
+        "value": 400,
+        "explanation": "Nigon elements are thought to be conserved chromosomal units that can be rearranged, influencing karyotype evolution."
+      },
+      {
+        "question": "Which paper provided insights into the differential chromosomal localization that relates to DNA elimination and may indirectly relate to Nigon elements?",
+        "choices": [
+          "Kang et al., 2016",
+          "Wang 2021",
+          "Zagoskin and Wang, 2021",
+          "Zagoskin et al., 2022"
+        ],
+        "answer": 0,
+        "value": 500,
+        "explanation": "Kang et al., 2016 discussed differential CENP-A localization that contributes to PDE; such studies help frame the context in which Nigon elements are investigated."
+      }
+      // ... (at least 10 questions total)
+    ]
+  },
+  "final": [
+    {
+      "question": "Final Jeopardy: Which integrated combination of long-read sequencing and chromatin conformation capture has most advanced our understanding of PDE in nematodes?",
+      "choices": [
+        "A. Illumina paired-end sequencing and ChIP-Seq",
+        "B. Sanger sequencing and RNA-Seq",
+        "C. PacBio long-read sequencing and Hi-C",
+        "D. Nanopore sequencing and ATAC-Seq"
+      ],
+      "answer": 2,
+      "explanation": "The combination of PacBio long-read sequencing with Hi-C has been pivotal for assembling complex nematode genomes and revealing the dynamics of PDE."
+    },
+    {
+      "question": "Final Jeopardy: In the context of PDE, what mechanism is primarily responsible for the selective loss of germline-expressed genes?",
+      "choices": [
+        "A. Random mutation accumulation",
+        "B. Targeted double-strand break formation followed by telomere healing",
+        "C. Global epigenetic silencing",
+        "D. Unequal chromosomal segregation"
+      ],
+      "answer": 1,
+      "explanation": "Selective loss is achieved through targeted double-strand break formation followed by telomere healing, which removes specific germline-expressed genes from somatic cells."
+    },
+    {
+      "question": "Final Jeopardy: Comparative analysis of PDE in Ascaris versus Oscheius tipulae reveals which key difference in DNA break repair?",
+      "choices": [
+        "A. Only Ascaris uses homologous recombination",
+        "B. Oscheius exhibits unbiased telomere healing on both retained and eliminated ends",
+        "C. Ascaris shows a repair bias favoring retained ends for telomere healing",
+        "D. Both species use nonhomologous end joining exclusively"
+      ],
+      "answer": 2,
+      "explanation": "Ascaris demonstrates a repair bias that favors telomere healing on retained ends, unlike the more uniform healing observed in Oscheius tipulae."
+    }
+  ]
+}
