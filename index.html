@@ -19,6 +19,13 @@
       padding: 30px;
       font-size: 2.5em;
     }
+    /* Controls container */
+    #controls {
+      max-width: 1200px;
+      margin: 10px auto;
+      text-align: right;
+      padding: 0 20px;
+    }
     /* Enlarged game board */
     #gameBoard {
       display: grid;
@@ -193,7 +200,7 @@
     let currentPlayer = 0;
     let round = 1; // 1 = Jeopardy, 2 = Double Jeopardy
     let questionsAnswered = 0;
-    const totalQuestionsPerRound = 25; // 5 categories x 5 questions each
+    const totalQuestionsPerRound = 25; // 5 categories x 5 questions
     let roundData = {}; // Holds selected questions for the round
     let selectedChoiceIndex = null;
     let currentQuestion = null;
@@ -209,7 +216,7 @@
     let questionBank = null;
 
     // Fetch the question bank JSON from the external file.
-    fetch('question_bank.json')
+    fetch('./question_bank.json')
       .then(response => {
         console.log("Fetch response status:", response.status);
         return response.json();
@@ -222,7 +229,6 @@
         document.getElementById('btn1').disabled = false;
         document.getElementById('btn2').disabled = false;
         document.getElementById('btn3').disabled = false;
-        // Remove disabled style class.
         document.getElementById('btn1').classList.remove('start-btn');
         document.getElementById('btn2').classList.remove('start-btn');
         document.getElementById('btn3').classList.remove('start-btn');
@@ -253,6 +259,7 @@
       displayScoreBoard();
       document.getElementById('controls').style.display = 'block';
       if (questionBank) {
+        console.log("Initializing Round 1 from bank.");
         initializeRoundFromBank('round1', round1Categories);
       } else {
         alert("Question bank not loaded yet. Please refresh or try again later.");
@@ -264,15 +271,14 @@
     function initializeRoundFromBank(roundKey, categories) {
       questionsAnswered = 0;
       roundData = {};
-      // For each fixed category, randomly choose 5 questions from available questions.
       categories.forEach(cat => {
         let allQuestions = questionBank[roundKey][cat];
+        console.log("Loading category:", cat, allQuestions);
         if (!allQuestions || allQuestions.length < 5) {
           console.error("Not enough questions in category:", cat);
           return;
         }
         let selected = shuffle([...allQuestions]).slice(0, 5);
-        // Sort selected questions by ascending value so top cell is $100 and bottom is $500.
         selected.sort((a, b) => a.value - b.value);
         selected.forEach(q => {
           q.originalValue = q.value;
@@ -280,7 +286,6 @@
         });
         roundData[cat] = selected;
       });
-      // Pick one random Daily Double among the 25 questions.
       let allQIndices = [];
       categories.forEach(cat => {
         roundData[cat].forEach((q, idx) => {
@@ -289,6 +294,7 @@
       });
       let ddChoice = allQIndices[Math.floor(Math.random() * allQIndices.length)];
       roundData[ddChoice.cat][ddChoice.idx].dailyDouble = true;
+      console.log("Daily Double set in category:", ddChoice.cat, "question index:", ddChoice.idx);
       generateBoard(categories);
     }
     
@@ -313,6 +319,7 @@
           gameBoard.appendChild(cell);
         });
       }
+      console.log("Game board generated for categories:", categories);
     }
     
     // ---------------- Scoreboard and Active Player ----------------
@@ -328,6 +335,7 @@
         scoreBoard.appendChild(div);
       });
       scoreBoard.style.display = 'flex';
+      console.log("Scoreboard updated:", players);
     }
     
     function updateScoreBoard() {
@@ -358,6 +366,7 @@
         alert("Skipping to Final Jeopardy.");
         setTimeout(startFinalJeopardy, 1000);
       }
+      console.log("Skip Round activated. Current round:", round);
     }
     
     // ---------------- Question Modal and Answer Logic ----------------
@@ -393,6 +402,7 @@
         showChoices();
       }
       document.getElementById('questionModal').style.display = 'block';
+      console.log("Opened question:", currentQuestion.question);
     }
     
     function confirmWager() {
@@ -410,6 +420,7 @@
       currentWager = wager;
       document.getElementById('modalContent').innerHTML = "";
       showChoices();
+      console.log("Wager confirmed:", currentWager);
     }
     
     function showChoices() {
@@ -423,6 +434,7 @@
         choiceContainer.appendChild(p);
       });
       document.getElementById('confirmButton').style.display = 'inline-block';
+      console.log("Choices displayed for question.");
     }
     
     function selectChoice(element, idx) {
@@ -432,6 +444,7 @@
       }
       element.classList.add('selected');
       selectedChoiceIndex = idx;
+      console.log("Choice selected:", element.textContent);
     }
     
     function confirmAnswer() {
@@ -465,6 +478,7 @@
       }
       document.getElementById('confirmButton').style.display = 'none';
       questionsAnswered++;
+      console.log("Question answered. Total answered:", questionsAnswered);
       if (questionsAnswered === totalQuestionsPerRound) {
         if (round === 1) {
           round = 2;
@@ -498,6 +512,7 @@
       });
       window.finalQuestion = finalQuestion;
       document.getElementById('finalModal').style.display = 'block';
+      console.log("Final Jeopardy started.");
     }
     
     function finalConfirm() {
@@ -518,6 +533,7 @@
       updateScoreBoard();
       alert("Final Jeopardy complete! Check the scoreboard for final results.");
       document.getElementById('finalModal').style.display = 'none';
+      console.log("Final Jeopardy scores updated.");
     }
     
     // ---------------- Utility: Shuffle an Array ----------------
