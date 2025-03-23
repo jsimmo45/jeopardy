@@ -19,6 +19,13 @@
       padding: 30px;
       font-size: 2.5em;
     }
+    /* Controls container */
+    #controls {
+      max-width: 1200px;
+      margin: 10px auto;
+      text-align: right;
+      padding: 0 20px;
+    }
     /* Enlarged game board */
     #gameBoard {
       display: grid;
@@ -147,6 +154,11 @@
   <!-- Scoreboard -->
   <section id="scoreBoard" style="display:none;"></section>
   
+  <!-- Controls: Skip Round Button -->
+  <div id="controls" style="display:none;">
+    <button onclick="skipRound()">Skip Round</button>
+  </div>
+  
   <!-- Game Board -->
   <section id="gameBoard" style="display:none;"></section>
   
@@ -178,7 +190,7 @@
     let currentPlayer = 0;
     let round = 1; // 1 = Jeopardy, 2 = Double Jeopardy
     let questionsAnswered = 0;
-    const totalQuestionsPerRound = 25; // 5 categories x 5 questions
+    const totalQuestionsPerRound = 25; // 5 categories x 5 questions each
     let roundData = {}; // Holds selected questions for the round
     let selectedChoiceIndex = null;
     let currentQuestion = null;
@@ -189,11 +201,11 @@
     // Fixed category order for each round:
     const round1Categories = ["Elimin-8 or Not", "Ascari-ology", "Oscheius Underfoot", "Telomere Time", "Data Dilemma"];
     const round2Categories = ["Parascaris Paradox", "C. Elegance", "Method to the Madness", "Research Riddles", "Evo-lution Revolution", "Nigon Nuances"];
-    
-    // Global variable to hold the loaded question bank from the external file
+
+    // Global variable to hold the loaded question bank from the external file.
     let questionBank = null;
 
-    // Fetch the question bank JSON from an external file
+    // Fetch the question bank JSON from the external file.
     fetch('question_bank.json')
       .then(response => response.json())
       .then(data => {
@@ -224,11 +236,12 @@
       round = 1;
       document.getElementById('playerSetup').style.display = 'none';
       displayScoreBoard();
+      document.getElementById('controls').style.display = 'block';
       // Initialize Round 1 after questionBank is loaded.
       if (questionBank) {
         initializeRoundFromBank('round1', round1Categories);
       } else {
-        alert("Question bank not loaded yet. Please try again.");
+        alert("Question bank not loaded yet. Please refresh or try again later.");
       }
       document.getElementById('gameBoard').style.display = 'grid';
     }
@@ -237,17 +250,15 @@
     function initializeRoundFromBank(roundKey, categories) {
       questionsAnswered = 0;
       roundData = {};
-      // For each fixed category, randomly choose 5 questions out of available ones.
+      // For each fixed category, randomly choose 5 questions from available questions.
       categories.forEach(cat => {
-        // Get the full list of questions for this category from the bank
         let allQuestions = questionBank[roundKey][cat];
         if (!allQuestions || allQuestions.length < 5) {
           console.error("Not enough questions in category:", cat);
           return;
         }
-        // Shuffle allQuestions and take first 5
         let selected = shuffle([...allQuestions]).slice(0, 5);
-        // Sort the selected set by value (ascending) so that the top is $100, bottom is $500.
+        // Sort selected questions by ascending value so that the top cell is $100 and bottom is $500.
         selected.sort((a, b) => a.value - b.value);
         // For Round 2, double the values.
         selected.forEach(q => {
@@ -272,14 +283,14 @@
     function generateBoard(categories) {
       const gameBoard = document.getElementById('gameBoard');
       gameBoard.innerHTML = "";
-      // Create category headers in the fixed order.
+      // Create category headers in fixed order.
       categories.forEach(cat => {
         let div = document.createElement('div');
         div.className = 'category';
         div.textContent = cat;
         gameBoard.appendChild(div);
       });
-      // Create 5 rows (one per question value)
+      // Create 5 rows (one for each question value).
       for (let i = 0; i < 5; i++) {
         categories.forEach(cat => {
           let qData = roundData[cat][i];
@@ -320,6 +331,23 @@
         if (index === currentPlayer) playerDiv.classList.add('active-player');
         else playerDiv.classList.remove('active-player');
       });
+    }
+    
+    // ---------------- Skip Round Functionality ----------------
+    function skipRound() {
+      if (!questionBank) {
+        alert("Question bank not loaded yet. Please wait.");
+        return;
+      }
+      // If currently in Round 1, move to Round 2; if in Round 2, skip to Final Jeopardy.
+      if (round === 1) {
+        round = 2;
+        alert("Skipping to Double Jeopardy (Round 2).");
+        initializeRoundFromBank('round2', round2Categories);
+      } else if (round === 2) {
+        alert("Skipping to Final Jeopardy.");
+        setTimeout(startFinalJeopardy, 1000);
+      }
     }
     
     // ---------------- Question Modal and Answer Logic ----------------
@@ -446,7 +474,6 @@
     // ---------------- Final Jeopardy ----------------
     function startFinalJeopardy() {
       document.getElementById('gameBoard').style.display = 'none';
-      // For final round, pick a random question from questionBank.final
       let finalQuestions = questionBank.final;
       let finalQuestion = finalQuestions[Math.floor(Math.random() * finalQuestions.length)];
       let container = document.getElementById('finalQuestionContainer');
@@ -484,7 +511,7 @@
       document.getElementById('finalModal').style.display = 'none';
     }
     
-    // ---------------- Utility Function: Shuffle an Array ----------------
+    // ---------------- Utility: Shuffle an Array ----------------
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1));
