@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Programmed DNA Elimination Jeopardy!</title>
+  <title>JeoPDE!</title>
   <style>
     /* Base styling for increased readability */
     body {
@@ -131,7 +131,7 @@
 </head>
 <body>
   <header>
-    <h1>Programmed DNA Elimination Jeopardy!</h1>
+    <h1>JeoPDE!</h1>
   </header>
   
   <!-- Player Setup Section -->
@@ -173,690 +173,34 @@
   </div>
   
   <script>
-    // Global Variables
+    // Global variables
     let players = [];
     let currentPlayer = 0;
     let round = 1; // 1 = Jeopardy, 2 = Double Jeopardy
     let questionsAnswered = 0;
-    const totalQuestionsPerRound = 25; // 5 categories x 5 questions each
-    let roundData = {}; // Board data for current round
+    const totalQuestionsPerRound = 25; // 5 categories x 5 questions
+    let roundData = {}; // Holds selected questions for the round
     let selectedChoiceIndex = null;
     let currentQuestion = null;
     let currentCategory = "";
     let currentIndex = -1;
     let currentWager = 0; // For Daily Double
 
-    // Fixed category names for each round (punny titles)
+    // Fixed category order for each round:
     const round1Categories = ["Elimin-8 or Not", "Ascari-ology", "Oscheius Underfoot", "Telomere Time", "Data Dilemma"];
-    const round2Categories = ["Parascaris Paradox", "C. Elegance", "Method to the Madness", "Research Riddles", "Evo-lution Revolution"];
+    const round2Categories = ["Parascaris Paradox", "C. Elegance", "Method to the Madness", "Research Riddles", "Evo-lution Revolution", "Nigon Nuances"];
+    
+    // Global variable to hold the loaded question bank from the external file
+    let questionBank = null;
 
-    // ------------------ Round 1 Question Bank ------------------
-    // Each category has exactly 5 questions.
-    const round1Bank = {
-      "Elimin-8 or Not": [
-        {
-          question: "In nematodes, what is the primary role of programmed DNA elimination?",
-          choices: [
-            "To remove germline-specific sequences",
-            "To repair damaged DNA",
-            "To duplicate chromosomes",
-            "To stimulate cell division"
-          ],
-          answer: 0,
-          value: 100,
-          explanation: "PDE removes germline-specific sequences from somatic cells, ensuring those genes are permanently silenced."
-        },
-        {
-          question: "Which statement best describes PDE?",
-          choices: [
-            "A random DNA loss process",
-            "A highly reproducible mechanism",
-            "A process for increasing mutation rates",
-            "A method to duplicate the genome"
-          ],
-          answer: 1,
-          value: 200,
-          explanation: "PDE is highly regulated, ensuring that the same sequences are consistently eliminated."
-        },
-        {
-          question: "PDE typically occurs during which developmental stage in nematodes?",
-          choices: [
-            "Adult stage",
-            "Late embryogenesis",
-            "Early embryogenesis",
-            "Larval stage"
-          ],
-          answer: 2,
-          value: 300,
-          explanation: "PDE occurs during early embryogenesis when the separation of germline and somatic cells begins."
-        },
-        {
-          question: "Which type of genes are most often eliminated during PDE?",
-          choices: [
-            "Housekeeping genes",
-            "Germline-expressed genes",
-            "Ribosomal RNA genes",
-            "Metabolic genes"
-          ],
-          answer: 1,
-          value: 400,
-          explanation: "Germline-expressed genes are removed from somatic cells to prevent their unwanted expression."
-        },
-        {
-          question: "Which sequence of developmental stages correctly describes the life cycle of Ascaris lumbricoides?",
-          choices: [
-            "Egg → Larva (lung migration) → Adult in intestine",
-            "Egg → Adult in intestine → Larva in bloodstream",
-            "Larva → Egg → Adult in muscle",
-            "Adult in intestine → Egg → Larva in soil"
-          ],
-          answer: 0,
-          value: 500,
-          explanation: "Ascaris lumbricoides has a well-established life cycle: eggs are ingested, larvae hatch and migrate (including lung passage), then mature into adults in the intestine."
-        }
-      ],
-      "Ascari-ology": [
-        {
-          question: "In Ascaris, during PDE, what happens to the chromosome ends?",
-          choices: [
-            "They are elongated",
-            "They are methylated",
-            "They are broken and re-healed with new telomeres",
-            "They fuse with other chromosomes"
-          ],
-          answer: 2,
-          value: 100,
-          explanation: "In Ascaris, chromosome ends are broken and subsequently re-healed by de novo telomere addition."
-        },
-        {
-          question: "Approximately how many germline-expressed genes are eliminated in Ascaris?",
-          choices: [
-            "Around 100",
-            "About 500",
-            "Approximately 1000",
-            "Over 2000"
-          ],
-          answer: 2,
-          value: 200,
-          explanation: "Research shows that roughly 1000 germline-expressed genes are eliminated during PDE in Ascaris."
-        },
-        {
-          question: "Which technique enabled the complete assembly of the Ascaris genome?",
-          choices: [
-            "Sanger sequencing",
-            "PacBio long-read sequencing with Hi-C",
-            "RNA-Seq",
-            "Microarray analysis"
-          ],
-          answer: 1,
-          value: 300,
-          explanation: "Combining PacBio long-read sequencing with Hi-C data was key to assembling the complex Ascaris genome."
-        },
-        {
-          question: "What is the outcome of chromosome remodeling in Ascaris after PDE?",
-          choices: [
-            "Decreased chromosome number",
-            "Formation of new somatic chromosomes",
-            "Fusion of all chromosomes",
-            "Duplication of telomeres"
-          ],
-          answer: 1,
-          value: 400,
-          explanation: "PDE leads to the splitting of germline chromosomes into additional somatic chromosomes."
-        },
-        // Life cycle question inserted here (replacing a genomics question)
-        {
-          question: "Which sequence correctly represents the life cycle of Ascaris lumbricoides?",
-          choices: [
-            "Egg → Larva (lung migration) → Adult in intestine",
-            "Egg → Adult in intestine → Larva in bloodstream",
-            "Larva → Egg → Adult in muscle",
-            "Adult in intestine → Egg → Larva in soil"
-          ],
-          answer: 0,
-          value: 500,
-          explanation: "The correct life cycle of Ascaris lumbricoides is: ingestion of eggs, hatching into larvae that migrate (including via the lungs), and maturation into adults in the intestine."
-        }
-      ],
-      "Oscheius Underfoot": [
-        {
-          question: "In Oscheius tipulae, which conserved motif is essential for directing DNA breaks during PDE?",
-          choices: [
-            "TATA box",
-            "SFE (Sequence For Elimination)",
-            "CAAT box",
-            "Poly-A signal"
-          ],
-          answer: 1,
-          value: 100,
-          explanation: "The SFE motif is critical in specifying where DNA breaks occur during PDE in Oscheius tipulae."
-        },
-        {
-          question: "At which embryonic stage does PDE occur in Oscheius tipulae?",
-          choices: [
-            "2-cell stage",
-            "4-cell stage",
-            "8- to 16-cell stage",
-            "Larval stage"
-          ],
-          answer: 2,
-          value: 200,
-          explanation: "PDE in Oscheius tipulae is observed during the 8- to 16-cell stage of embryogenesis."
-        },
-        {
-          question: "Which statement best describes the life cycle of Oscheius tipulae?",
-          choices: [
-            "It is a free-living nematode with a rapid, soil-based life cycle completed in days",
-            "It is a parasitic nematode with a complex life cycle in animal hosts",
-            "It has an extended life cycle spanning several months",
-            "It alternates between free-living and parasitic phases"
-          ],
-          answer: 0,
-          value: 300,
-          explanation: "Oscheius tipulae is a free-living nematode that completes its life cycle quickly—typically within a few days in soil."
-        },
-        {
-          question: "A mutation in which element leads to a 'fail-to-eliminate' phenotype in Oscheius tipulae?",
-          choices: [
-            "Telomere repeat",
-            "SFE motif",
-            "Centromere sequence",
-            "Promoter region"
-          ],
-          answer: 1,
-          value: 400,
-          explanation: "Mutations in the SFE motif disrupt the normal DNA break process, causing a failure in DNA elimination."
-        },
-        {
-          question: "According to END-seq analysis, DNA breaks in Oscheius tipulae are characterized by:",
-          choices: [
-            "Minimal end resection",
-            "Extensive end resection within the SFE motif",
-            "No observable DNA break",
-            "Random break distribution with no motif"
-          ],
-          answer: 1,
-          value: 500,
-          explanation: "END-seq data reveal that DNA breaks in Oscheius tipulae involve extensive end resection specifically at the SFE motif."
-        }
-      ],
-      "Telomere Time": [
-        {
-          question: "In nematodes, what process restores broken chromosome ends?",
-          choices: [
-            "Homologous recombination",
-            "Nonhomologous end joining",
-            "De novo telomere addition",
-            "DNA methylation"
-          ],
-          answer: 2,
-          value: 100,
-          explanation: "Broken chromosome ends are restored by de novo telomere addition, a critical repair mechanism during PDE."
-        },
-        {
-          question: "In Ascaris, telomere healing is biased toward which DNA ends?",
-          choices: [
-            "Retained ends",
-            "Eliminated ends",
-            "Both equally",
-            "Neither"
-          ],
-          answer: 0,
-          value: 200,
-          explanation: "Telomere healing in Ascaris preferentially occurs on the retained ends of DNA breaks."
-        },
-        {
-          question: "Which enzyme is central to the telomere addition process?",
-          choices: [
-            "DNA polymerase",
-            "Telomerase",
-            "Ligase",
-            "Helicase"
-          ],
-          answer: 1,
-          value: 300,
-          explanation: "Telomerase adds telomeric repeats to broken chromosome ends during de novo telomere addition."
-        },
-        {
-          question: "How does the extent of end resection differ in Ascaris?",
-          choices: [
-            "Retained ends are more resected",
-            "Eliminated ends are more resected",
-            "Both are resected equally",
-            "Neither is resected"
-          ],
-          answer: 1,
-          value: 400,
-          explanation: "Eliminated ends exhibit more extensive resection than retained ends, influencing telomere healing."
-        },
-        {
-          question: "Which technique is used to map de novo telomere addition sites?",
-          choices: [
-            "END-seq",
-            "RNA-Seq",
-            "ChIP-Seq",
-            "ATAC-Seq"
-          ],
-          answer: 0,
-          value: 500,
-          explanation: "END-seq is the method employed to pinpoint the exact sites where new telomeres are added after DNA breaks."
-        }
-      ],
-      "Data Dilemma": [
-        {
-          question: "In Ascaris research data, the consistent loss of subtelomeric regions during PDE suggests what about chromosome evolution?",
-          choices: [
-            "Random genomic degradation",
-            "An evolutionary mechanism to resolve chromosome fusions",
-            "A byproduct of high mutation rates",
-            "Experimental error"
-          ],
-          answer: 1,
-          value: 100,
-          explanation: "The loss of subtelomeric regions likely reflects an adaptation to resolve fused chromosomes."
-        },
-        {
-          question: "How does extensive end resection at DNA break sites inform our understanding of telomere healing?",
-          choices: [
-            "It suggests telomere healing is error-prone",
-            "It indicates a regulated process distinguishing retained from eliminated DNA",
-            "It implies resection is irrelevant",
-            "It occurs only in germline cells"
-          ],
-          answer: 1,
-          value: 200,
-          explanation: "Extensive resection indicates a controlled repair mechanism that favors healing of retained DNA."
-        },
-        {
-          question: "What is the significance of detecting additional DNA breaks as a fail-safe during PDE in Ascaris?",
-          choices: [
-            "It increases the chance of complete gene loss",
-            "It ensures no residual germline-specific DNA remains in somatic cells",
-            "It serves to initiate apoptosis",
-            "It compensates for telomere shortening"
-          ],
-          answer: 1,
-          value: 300,
-          explanation: "Additional breaks act as a fail-safe mechanism to guarantee complete elimination of unwanted DNA."
-        },
-        {
-          question: "What does the differential telomere healing between retained and eliminated DNA imply?",
-          choices: [
-            "Both are repaired identically",
-            "A repair bias favors healing of retained DNA",
-            "Telomere healing is completely random",
-            "Healing depends solely on sequence context"
-          ],
-          answer: 1,
-          value: 400,
-          explanation: "The data imply a repair bias that favors telomere healing on retained DNA ends."
-        },
-        {
-          question: "Based on the data from Ascaris, how might PDE drive genomic evolution?",
-          choices: [
-            "By introducing point mutations",
-            "By generating novel somatic chromosomes and resolving fusions",
-            "By maintaining a constant genome size",
-            "By increasing homologous recombination"
-          ],
-          answer: 1,
-          value: 500,
-          explanation: "PDE reshapes the genome by creating new somatic chromosomes and resolving fused chromosomes, driving evolution."
-        }
-      ]
-    };
-
-    // ------------------ Round 2 Question Bank ------------------
-    // Round 2 uses different categories.
-    const round2Bank = {
-      "Parascaris Paradox": [
-        {
-          question: "In Parascaris, PDE is known to occur during which embryonic stages?",
-          choices: [
-            "2- to 32-cell stages",
-            "4- to 16-cell stages",
-            "8- to 16-cell stages",
-            "16- to 32-cell stages"
-          ],
-          answer: 0,
-          value: 100,
-          explanation: "In Parascaris, PDE occurs from the 2-cell stage up to the 32-cell stage."
-        },
-        {
-          question: "What distinguishes the eliminated DNA of Parascaris from that of Ascaris?",
-          choices: [
-            "Parascaris eliminates only repetitive DNA",
-            "Parascaris eliminates a higher percentage of both genes and repeats",
-            "Parascaris retains all telomeres",
-            "Parascaris does not eliminate any DNA"
-          ],
-          answer: 1,
-          value: 200,
-          explanation: "Parascaris is known to eliminate a greater percentage of its genome, including both genes and repetitive elements."
-        },
-        {
-          question: "Which observation supports the occurrence of PDE in Parascaris?",
-          choices: [
-            "Uniform chromosome structure in somatic cells",
-            "Reduced genome coverage at chromosome ends in somatic cells",
-            "Increased number of centromeres in somatic cells",
-            "No difference between germline and somatic cells"
-          ],
-          answer: 1,
-          value: 300,
-          explanation: "A drop in genome coverage at chromosome ends in somatic cells is a hallmark of PDE in Parascaris."
-        },
-        {
-          question: "In Parascaris, what happens to the eliminated DNA after PDE?",
-          choices: [
-            "It is degraded in the cytoplasm",
-            "It is reincorporated into the genome",
-            "It is used to repair broken chromosomes",
-            "It forms extra-chromosomal circles"
-          ],
-          answer: 0,
-          value: 400,
-          explanation: "Eliminated DNA in Parascaris is sequestered and eventually degraded in the cytoplasm."
-        },
-        {
-          question: "Which sequence correctly represents the life cycle of Parascaris univalens?",
-          choices: [
-            "Egg → Larva (lung migration) → Adult in intestine",
-            "Egg → Adult in intestine → Larva in bloodstream",
-            "Larva → Egg → Adult in muscle",
-            "Egg → Larva (no migration) → Adult"
-          ],
-          answer: 0,
-          value: 500,
-          explanation: "The life cycle of Parascaris univalens follows: eggs are ingested, larvae hatch and migrate (including through the lungs), and mature into adults in the intestine."
-        }
-      ],
-      "C. Elegance": [
-        {
-          question: "How many somatic cells does an adult C. elegans hermaphrodite typically have?",
-          choices: [
-            "302",
-            "558",
-            "959",
-            "1096"
-          ],
-          answer: 2,
-          value: 100,
-          explanation: "An adult C. elegans hermaphrodite has exactly 959 somatic cells."
-        },
-        {
-          question: "Which nematode is the standard model organism for developmental biology?",
-          choices: [
-            "Ascaris",
-            "Oscheius tipulae",
-            "C. elegans",
-            "Parascaris"
-          ],
-          answer: 2,
-          value: 200,
-          explanation: "C. elegans is the standard model for developmental studies in nematodes."
-        },
-        {
-          question: "What is the typical lifespan of C. elegans under laboratory conditions?",
-          choices: [
-            "2-3 days",
-            "7-10 days",
-            "20-30 days",
-            "60-90 days"
-          ],
-          answer: 1,
-          value: 300,
-          explanation: "Under standard laboratory conditions, C. elegans lives for about 7-10 days at 20°C."
-        },
-        {
-          question: "Which gene in C. elegans is key in regulating dauer formation?",
-          choices: [
-            "unc-54",
-            "daf-2",
-            "lin-4",
-            "egl-1"
-          ],
-          answer: 1,
-          value: 400,
-          explanation: "The daf-2 gene, part of the insulin/IGF pathway, is crucial for regulating dauer formation in C. elegans."
-        },
-        {
-          question: "Which sequence best represents the developmental progression (life cycle) of C. elegans?",
-          choices: [
-            "Egg → L1 → L2 → L3 → L4 → Adult",
-            "Egg → L2 → L3 → Adult",
-            "Adult → Egg → Larva → Adult",
-            "Egg → Larva → Pupa → Adult"
-          ],
-          answer: 0,
-          value: 500,
-          explanation: "The typical life cycle of C. elegans follows: Egg, four larval stages (L1 to L4), and then the Adult stage."
-        }
-      ],
-      "Method to the Madness": [
-        {
-          question: "Which sequencing method is particularly effective for assembling complex, repetitive genomes?",
-          choices: [
-            "Illumina short-read sequencing",
-            "PacBio long-read sequencing",
-            "Sanger sequencing",
-            "Nanopore sequencing"
-          ],
-          answer: 1,
-          value: 100,
-          explanation: "PacBio long-read sequencing can span long repeats, making it ideal for assembling complex genomes."
-        },
-        {
-          question: "Which technique is used to study the 3D organization of the genome?",
-          choices: [
-            "RNA-Seq",
-            "ChIP-Seq",
-            "Hi-C",
-            "ATAC-Seq"
-          ],
-          answer: 2,
-          value: 200,
-          explanation: "Hi-C captures chromatin interactions and is used to study the 3D architecture of genomes."
-        },
-        {
-          question: "What does END-seq measure in the context of PDE research?",
-          choices: [
-            "DNA double-strand break resection",
-            "Gene expression levels",
-            "Protein-protein interactions",
-            "DNA methylation patterns"
-          ],
-          answer: 0,
-          value: 300,
-          explanation: "END-seq measures the extent of resection at DNA double-strand break sites."
-        },
-        {
-          question: "Which method is used to visualize telomere locations during PDE?",
-          choices: [
-            "FISH (Fluorescence in situ hybridization)",
-            "Western blotting",
-            "Flow cytometry",
-            "PCR"
-          ],
-          answer: 0,
-          value: 400,
-          explanation: "FISH is used to visually locate telomeres during PDE."
-        },
-        {
-          question: "What is a major advantage of long-read sequencing over short-read methods?",
-          choices: [
-            "Higher throughput",
-            "Better resolution of repetitive regions",
-            "Lower error rates",
-            "Faster run times"
-          ],
-          answer: 1,
-          value: 500,
-          explanation: "Long-read sequencing excels at resolving long repetitive regions that are challenging for short-read technologies."
-        }
-      ],
-      "Research Riddles": [
-        {
-          question: "Which method is commonly used to detect protein-protein interactions on a large scale?",
-          choices: [
-            "Yeast two-hybrid",
-            "Western blot",
-            "RNA-Seq",
-            "ChIP-Seq"
-          ],
-          answer: 0,
-          value: 100,
-          explanation: "Yeast two-hybrid screening is widely employed to identify protein-protein interactions."
-        },
-        {
-          question: "What is the primary purpose of ChIP-Seq?",
-          choices: [
-            "To map protein-DNA interactions",
-            "To sequence RNA",
-            "To measure metabolite levels",
-            "To analyze chromatin accessibility"
-          ],
-          answer: 0,
-          value: 200,
-          explanation: "ChIP-Seq is used to determine where DNA-associated proteins bind across the genome."
-        },
-        {
-          question: "Which technique is best suited for assessing chromatin accessibility genome-wide?",
-          choices: [
-            "ATAC-Seq",
-            "RNA-Seq",
-            "Sanger sequencing",
-            "Mass spectrometry"
-          ],
-          answer: 0,
-          value: 300,
-          explanation: "ATAC-Seq identifies regions of open chromatin across the genome."
-        },
-        {
-          question: "Which method is most appropriate for single-cell transcriptomics?",
-          choices: [
-            "Bulk RNA-Seq",
-            "scRNA-Seq",
-            "ChIP-Seq",
-            "Hi-C"
-          ],
-          answer: 1,
-          value: 400,
-          explanation: "scRNA-Seq allows transcriptome analysis at the single-cell level."
-        },
-        {
-          question: "What is one key advantage of using CRISPR-Cas9 in research?",
-          choices: [
-            "It allows targeted gene editing",
-            "It increases mutation rates randomly",
-            "It silences all genes indiscriminately",
-            "It only works in prokaryotes"
-          ],
-          answer: 0,
-          value: 500,
-          explanation: "CRISPR-Cas9 enables precise, targeted modifications in the genome."
-        }
-      ],
-      "Evo-lution Revolution": [
-        {
-          question: "PDE may offer an evolutionary advantage by:",
-          choices: [
-            "Increasing genome size",
-            "Removing harmful germline-specific sequences",
-            "Enhancing mutation rates",
-            "Stimulating cell proliferation"
-          ],
-          answer: 1,
-          value: 100,
-          explanation: "By eliminating unnecessary germline-specific sequences, PDE streamlines the somatic genome."
-        },
-        {
-          question: "Comparative genomics suggests that PDE:",
-          choices: [
-            "Evolved in a single lineage",
-            "May have evolved independently in different lineages",
-            "Is exclusive to parasitic nematodes",
-            "Does not affect genome evolution"
-          ],
-          answer: 1,
-          value: 200,
-          explanation: "Evidence indicates that PDE has independently evolved in multiple groups."
-        },
-        {
-          question: "Elimination of certain genes during PDE primarily serves to:",
-          choices: [
-            "Prevent their expression in somatic cells",
-            "Increase genetic diversity",
-            "Enhance cell growth",
-            "Trigger DNA repair mechanisms"
-          ],
-          answer: 0,
-          value: 300,
-          explanation: "Removing these genes ensures that they are not inappropriately expressed in somatic cells."
-        },
-        {
-          question: "PDE has been linked to the evolution of:",
-          choices: [
-            "Chromosome fusion resolution",
-            "Increased intron density",
-            "Expanded mitochondrial genomes",
-            "Enhanced protein synthesis"
-          ],
-          answer: 0,
-          value: 400,
-          explanation: "PDE contributes to resolving fused chromosomes, refining the karyotype over evolutionary time."
-        },
-        {
-          question: "How might PDE drive speciation in nematodes?",
-          choices: [
-            "By generating irreversible genomic changes",
-            "By promoting gene flow between populations",
-            "By conserving ancestral gene order",
-            "By increasing horizontal gene transfer"
-          ],
-          answer: 0,
-          value: 500,
-          explanation: "Irreversible genomic changes due to PDE can lead to reproductive isolation and speciation."
-        }
-      ]
-    };
-
-    // Final Jeopardy bank (remains unchanged)
-    const finalJeopardyBank = [
-      {
-        question: "Final Jeopardy: Which integrated combination of long-read sequencing and chromatin conformation capture has most advanced our understanding of PDE in nematodes?",
-        choices: [
-          "A. Illumina paired-end sequencing and ChIP-Seq",
-          "B. Sanger sequencing and RNA-Seq",
-          "C. PacBio long-read sequencing and Hi-C",
-          "D. Nanopore sequencing and ATAC-Seq"
-        ],
-        answer: 2,
-        explanation: "The combination of PacBio long-read sequencing with Hi-C has been pivotal for assembling complex genomes and revealing PDE dynamics."
-      },
-      {
-        question: "Final Jeopardy: In the context of PDE, what mechanism is primarily responsible for the selective loss of germline-expressed genes?",
-        choices: [
-          "A. Random mutation accumulation",
-          "B. Targeted double-strand break formation followed by telomere healing",
-          "C. Global epigenetic silencing",
-          "D. Unequal chromosomal segregation"
-        ],
-        answer: 1,
-        explanation: "Selective gene loss is achieved through targeted DSB formation and subsequent telomere healing."
-      },
-      {
-        question: "Final Jeopardy: Comparative analysis of PDE in Ascaris versus Oscheius tipulae reveals which key difference in DNA break repair?",
-        choices: [
-          "A. Only Ascaris uses homologous recombination",
-          "B. Oscheius tipulae exhibits unbiased telomere healing on both retained and eliminated ends",
-          "C. Ascaris shows a repair bias favoring retained ends for telomere healing",
-          "D. Both species use nonhomologous end joining exclusively"
-        ],
-        answer: 2,
-        explanation: "Ascaris demonstrates a repair bias that favors telomere healing on retained ends, unlike the more uniform healing observed in Oscheius tipulae."
-      }
-    ];
+    // Fetch the question bank JSON from an external file
+    fetch('question_bank.json')
+      .then(response => response.json())
+      .then(data => {
+        questionBank = data;
+        console.log("Question bank loaded.");
+      })
+      .catch(error => console.error('Error loading question bank:', error));
 
     // ---------------- Player Setup Functions ----------------
     function prepareNameInputs(numPlayers) {
@@ -880,59 +224,66 @@
       round = 1;
       document.getElementById('playerSetup').style.display = 'none';
       displayScoreBoard();
-      initializeRound();
+      // Initialize Round 1 after questionBank is loaded.
+      if (questionBank) {
+        initializeRoundFromBank('round1', round1Categories);
+      } else {
+        alert("Question bank not loaded yet. Please try again.");
+      }
       document.getElementById('gameBoard').style.display = 'grid';
     }
     
-    // ---------------- Game Board Initialization ----------------
-    function initializeRound() {
+    // ---------------- Initialize Round from External Bank ----------------
+    function initializeRoundFromBank(roundKey, categories) {
       questionsAnswered = 0;
-      let currentBank, categories;
-      if (round === 1) {
-        currentBank = round1Bank;
-        categories = round1Categories;
-      } else {
-        currentBank = round2Bank;
-        categories = round2Categories;
-      }
       roundData = {};
+      // For each fixed category, randomly choose 5 questions out of available ones.
       categories.forEach(cat => {
-        // Deep copy and sort by ascending value (ensuring $100 at top, $500 at bottom)
-        roundData[cat] = JSON.parse(JSON.stringify(currentBank[cat])).sort((a, b) => a.value - b.value);
-        // Apply round multiplier (Round 2 values are doubled).
-        roundData[cat].forEach(q => {
+        // Get the full list of questions for this category from the bank
+        let allQuestions = questionBank[roundKey][cat];
+        if (!allQuestions || allQuestions.length < 5) {
+          console.error("Not enough questions in category:", cat);
+          return;
+        }
+        // Shuffle allQuestions and take first 5
+        let selected = shuffle([...allQuestions]).slice(0, 5);
+        // Sort the selected set by value (ascending) so that the top is $100, bottom is $500.
+        selected.sort((a, b) => a.value - b.value);
+        // For Round 2, double the values.
+        selected.forEach(q => {
           q.originalValue = q.value;
           q.value = q.value * (round === 1 ? 1 : 2);
         });
+        roundData[cat] = selected;
       });
       // Pick one random Daily Double among the 25 questions.
-      const allQuestions = [];
+      let allQIndices = [];
       categories.forEach(cat => {
         roundData[cat].forEach((q, idx) => {
-          allQuestions.push({ cat, idx });
+          allQIndices.push({ cat: cat, idx: idx });
         });
       });
-      const ddChoice = allQuestions[Math.floor(Math.random() * allQuestions.length)];
+      let ddChoice = allQIndices[Math.floor(Math.random() * allQIndices.length)];
       roundData[ddChoice.cat][ddChoice.idx].dailyDouble = true;
       generateBoard(categories);
     }
     
-    // Generate the game board using the fixed category order.
+    // ---------------- Generate the Game Board ----------------
     function generateBoard(categories) {
       const gameBoard = document.getElementById('gameBoard');
       gameBoard.innerHTML = "";
-      // Create category headers.
+      // Create category headers in the fixed order.
       categories.forEach(cat => {
-        const div = document.createElement('div');
+        let div = document.createElement('div');
         div.className = 'category';
         div.textContent = cat;
         gameBoard.appendChild(div);
       });
-      // Create 5 rows (for $100, $200, $300, $400, $500).
+      // Create 5 rows (one per question value)
       for (let i = 0; i < 5; i++) {
         categories.forEach(cat => {
-          const qData = roundData[cat][i];
-          const cell = document.createElement('div');
+          let qData = roundData[cat][i];
+          let cell = document.createElement('div');
           cell.className = 'question';
           cell.id = cat + "-" + i;
           cell.textContent = "$" + qData.value;
@@ -947,7 +298,7 @@
       const scoreBoard = document.getElementById('scoreBoard');
       scoreBoard.innerHTML = "";
       players.forEach((player, index) => {
-        const div = document.createElement('div');
+        let div = document.createElement('div');
         div.className = 'playerScore';
         div.id = 'player' + index;
         if (index === currentPlayer) div.classList.add('active-player');
@@ -965,7 +316,7 @@
     
     function updateActivePlayerDisplay() {
       players.forEach((_, index) => {
-        const playerDiv = document.getElementById('player' + index);
+        let playerDiv = document.getElementById('player' + index);
         if (index === currentPlayer) playerDiv.classList.add('active-player');
         else playerDiv.classList.remove('active-player');
       });
@@ -989,14 +340,14 @@
       // If Daily Double, prompt for wager.
       if (currentQuestion.dailyDouble) {
         const maxWager = players[currentPlayer].score > 0 ? players[currentPlayer].score : 1000;
-        const wagerDiv = document.createElement('div');
+        let wagerDiv = document.createElement('div');
         wagerDiv.innerHTML = `<p><strong>Daily Double!</strong> Enter your wager (max: ${maxWager}):</p>`;
-        const wagerInput = document.createElement('input');
+        let wagerInput = document.createElement('input');
         wagerInput.type = "number";
         wagerInput.id = "wagerInput";
         wagerInput.value = currentQuestion.value;
         wagerDiv.appendChild(wagerInput);
-        const wagerButton = document.createElement('button');
+        let wagerButton = document.createElement('button');
         wagerButton.textContent = "Confirm Wager";
         wagerButton.onclick = confirmWager;
         wagerDiv.appendChild(wagerButton);
@@ -1008,7 +359,7 @@
     }
     
     function confirmWager() {
-      const wagerInput = document.getElementById('wagerInput');
+      let wagerInput = document.getElementById('wagerInput');
       let wager = parseInt(wagerInput.value);
       const maxWager = players[currentPlayer].score > 0 ? players[currentPlayer].score : 1000;
       if (isNaN(wager) || wager <= 0) {
@@ -1028,7 +379,7 @@
       const choiceContainer = document.getElementById('choiceContainer');
       choiceContainer.innerHTML = "";
       currentQuestion.choices.forEach((choice, idx) => {
-        const p = document.createElement('p');
+        let p = document.createElement('p');
         p.className = 'choice';
         p.textContent = choice;
         p.onclick = function() { selectChoice(p, idx); };
@@ -1038,7 +389,7 @@
     }
     
     function selectChoice(element, idx) {
-      const choices = document.getElementsByClassName('choice');
+      let choices = document.getElementsByClassName('choice');
       for (let i = 0; i < choices.length; i++) {
         choices[i].classList.remove('selected');
       }
@@ -1068,7 +419,7 @@
       updateScoreBoard();
       updateActivePlayerDisplay();
       delete roundData[currentCategory][currentIndex];
-      const cell = document.getElementById(currentCategory + "-" + currentIndex);
+      let cell = document.getElementById(currentCategory + "-" + currentIndex);
       if (cell) {
         cell.style.background = "#555";
         cell.style.color = "#aaa";
@@ -1081,7 +432,7 @@
         if (round === 1) {
           round = 2;
           alert("Round 1 complete! Now entering Double Jeopardy (point values doubled).");
-          initializeRound();
+          initializeRoundFromBank('round2', round2Categories);
         } else {
           setTimeout(startFinalJeopardy, 1000);
         }
@@ -1095,10 +446,12 @@
     // ---------------- Final Jeopardy ----------------
     function startFinalJeopardy() {
       document.getElementById('gameBoard').style.display = 'none';
-      const finalQuestion = finalJeopardyBank[Math.floor(Math.random() * finalJeopardyBank.length)];
-      const container = document.getElementById('finalQuestionContainer');
+      // For final round, pick a random question from questionBank.final
+      let finalQuestions = questionBank.final;
+      let finalQuestion = finalQuestions[Math.floor(Math.random() * finalQuestions.length)];
+      let container = document.getElementById('finalQuestionContainer');
       container.innerHTML = `<h3>${finalQuestion.question}</h3>`;
-      const responsesDiv = document.getElementById('finalPlayerResponses');
+      let responsesDiv = document.getElementById('finalPlayerResponses');
       responsesDiv.innerHTML = "";
       players.forEach((player, idx) => {
         responsesDiv.innerHTML += `<div id="finalPlayer${idx}">
@@ -1113,13 +466,13 @@
     
     function finalConfirm() {
       players.forEach((player, idx) => {
-        const wager = parseInt(document.getElementById('finalWager' + idx).value);
-        const answer = document.getElementById('finalAnswer' + idx).value.trim();
+        let wager = parseInt(document.getElementById('finalWager' + idx).value);
+        let answer = document.getElementById('finalAnswer' + idx).value.trim();
         const maxWager = player.score > 0 ? player.score : 1000;
         let wagerVal = isNaN(wager) || wager <= 0 ? 0 : wager;
         if (wagerVal > maxWager) wagerVal = maxWager;
-        const correctOption = window.finalQuestion.choices[window.finalQuestion.answer].charAt(0).toUpperCase();
-        const givenOption = answer.charAt(0).toUpperCase();
+        let correctOption = window.finalQuestion.choices[window.finalQuestion.answer].charAt(0).toUpperCase();
+        let givenOption = answer.charAt(0).toUpperCase();
         if (givenOption === correctOption) {
           player.score += wagerVal;
         } else {
@@ -1129,6 +482,15 @@
       updateScoreBoard();
       alert("Final Jeopardy complete! Check the scoreboard for final results.");
       document.getElementById('finalModal').style.display = 'none';
+    }
+    
+    // ---------------- Utility Function: Shuffle an Array ----------------
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
     }
   </script>
 </body>
