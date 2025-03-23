@@ -207,10 +207,16 @@
 
     // Fetch the question bank JSON from the external file.
     fetch('question_bank.json')
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok " + response.statusText);
+       }
+        return response.json();
+      })
       .then(data => {
         questionBank = data;
-        console.log("Question bank loaded.");
+        console.log("Question bank loaded successfully.");
+        // Optionally enable the Start Game button here.
       })
       .catch(error => console.error('Error loading question bank:', error));
 
