@@ -123,7 +123,6 @@
         "value": 500,
         "explanation": "Ascaris chromosomes are holocentric, and changes in centromere protein (CENP-A) distribution help determine which regions are eliminated."
       }
-      // ... (at least 10 questions total)
     ],
     "Oscheius Underfoot": [
       {
@@ -186,7 +185,6 @@
         "value": 500,
         "explanation": "Differential CENP-A localization on Oscheius chromosomes plays a role in determining which parts are retained or eliminated."
       }
-      // ... (at least 10 questions total)
     ],
     "Telomere Time": [
       {
@@ -249,7 +247,6 @@
         "value": 500,
         "explanation": "END-seq is employed to precisely map the locations of new telomere addition after DNA breaks."
       }
-      // ... (at least 10 questions total)
     ],
     "Data Dilemma": [
       {
@@ -312,7 +309,6 @@
         "value": 500,
         "explanation": "Reduced CENP-A deposition in specific chromosomal regions marks them for elimination during PDE."
       }
-      // ... (at least 10 questions total)
     ]
   },
   "round2": {
@@ -377,7 +373,6 @@
         "value": 500,
         "explanation": "Parascaris univalens follows a life cycle with larval migration (including lung migration) before maturing into an adult in the intestine."
       }
-      // ... (at least 10 questions total)
     ],
     "C. Elegance": [
       {
@@ -440,7 +435,6 @@
         "value": 500,
         "explanation": "C. elegans is known for its invariant, fixed cell lineage, where each cell's fate is predetermined."
       }
-      // ... (at least 10 questions total)
     ],
     "Method to the Madness": [
       {
@@ -503,7 +497,6 @@
         "value": 500,
         "explanation": "Long-read sequencing excels at resolving long, repetitive regions that short-read methods cannot span."
       }
-      // ... (at least 10 questions total)
     ],
     "Research Riddles": [
       {
@@ -566,7 +559,6 @@
         "value": 500,
         "explanation": "CRISPR-Cas9 enables precise, targeted modifications in the genome."
       }
-      // ... (at least 10 questions total)
     ],
     "Evo-lution Revolution": [
       {
@@ -629,7 +621,6 @@
         "value": 500,
         "explanation": "Irreversible genomic changes due to PDE can lead to reproductive isolation and eventually speciation."
       }
-      // ... (at least 10 questions total)
     ],
     "Nigon Nuances": [
       {
@@ -692,7 +683,6 @@
         "value": 500,
         "explanation": "Kang et al., 2016 discussed differential CENP-A localization that contributes to PDE; such studies help frame the context in which Nigon elements are investigated."
       }
-      // ... (at least 10 questions total)
     ]
   },
   "final": [
