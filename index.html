@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>JeoPDE!</title>
   <style>
-    /* Base styling for increased readability */
+    /* Base styling */
     body {
       font-family: Arial, sans-serif;
       background: #f0f8ff;
@@ -26,7 +26,7 @@
       text-align: right;
       padding: 0 20px;
     }
-    /* Enlarged game board */
+    /* Game board styling */
     #gameBoard {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -50,7 +50,7 @@
       font-weight: bold;
       cursor: default;
     }
-    /* Scoreboard styles */
+    /* Scoreboard styling */
     #scoreBoard {
       max-width: 1000px;
       margin: 20px auto;
@@ -63,13 +63,14 @@
       padding: 20px;
       border-radius: 8px;
       width: 30%;
-      transition: box-shadow 0.3s;
+      transition: box-shadow 0.3s, border 0.3s, background 0.3s;
     }
+    /* Active player highlighted in blue */
     .active-player {
-      box-shadow: 0 0 15px 5px gold;
-      background: #fffacd;
+      border: 3px solid #0000ff;
+      background: #add8e6;
     }
-    /* Player Setup Styles */
+    /* Player Setup styling */
     #playerSetup {
       max-width: 600px;
       margin: 30px auto;
@@ -78,7 +79,7 @@
     #nameInputs {
       margin-top: 20px;
     }
-    input[type="text"] {
+    input[type="text"], input[type="number"] {
       padding: 10px;
       font-size: 1em;
       margin: 5px;
@@ -90,16 +91,14 @@
       font-size: 1em;
       cursor: pointer;
     }
-    /* Initially disable Start Game buttons */
     .start-btn {
       cursor: not-allowed;
     }
-    /* Loading message */
     #loadingMsg {
       font-size: 1.4em;
       color: #333;
     }
-    /* Modal styles */
+    /* Modal styling */
     .modal {
       display: none;
       position: fixed;
@@ -134,11 +133,6 @@
       background: #cce5ff;
       border: 2px solid #3399ff;
     }
-    input[type="number"] {
-      width: 150px;
-      font-size: 1em;
-      padding: 8px;
-    }
     hr {
       border: 1px solid #ccc;
       margin: 20px 0;
@@ -172,6 +166,14 @@
   <!-- Game Board -->
   <section id="gameBoard" style="display:none;"></section>
   
+  <!-- Modal for selecting answering player -->
+  <div id="playerSelectModal" class="modal">
+    <div class="modal-content">
+      <h2>Select the Player to Answer:</h2>
+      <div id="playerSelectButtons"></div>
+    </div>
+  </div>
+  
   <!-- Modal for questions -->
   <div id="questionModal" class="modal">
     <div class="modal-content">
@@ -184,13 +186,22 @@
     </div>
   </div>
   
-  <!-- Modal for Final Jeopardy -->
+  <!-- Final JeoPDE Modal -->
   <div id="finalModal" class="modal">
     <div class="modal-content">
-      <h2>Final Jeopardy</h2>
-      <div id="finalQuestionContainer"></div>
-      <div id="finalPlayerResponses"></div>
-      <button id="finalConfirmButton" onclick="finalConfirm()">Submit Final Answers</button>
+      <h2 id="finalCategoryTitle">Final JeoPDE Category</h2>
+      <!-- Wager section: players enter wager BEFORE seeing the question -->
+      <div id="finalWagerSection">
+        <p>Enter your wager for Final JeoPDE (each player; max: your score if positive, or 1000 if zero/negative):</p>
+        <div id="finalWagerInputs"></div>
+        <button onclick="submitFinalWagers()">Submit Wagers</button>
+      </div>
+      <!-- Final Question section: revealed after wagers are submitted -->
+      <div id="finalQuestionSection" style="display:none;">
+        <h3 id="finalQuestionText"></h3>
+        <div id="finalAnswerInputs"></div>
+        <button id="finalConfirmButton" onclick="finalConfirm()">Submit Final Answers</button>
+      </div>
     </div>
   </div>
   
@@ -198,24 +209,25 @@
     // Global variables
     let players = [];
     let currentPlayer = 0;
-    let round = 1; // 1 = Jeopardy, 2 = Double Jeopardy
+    let round = 1; // 1 = JeoPDE, 2 = Double JeoPDE
     let questionsAnswered = 0;
     const totalQuestionsPerRound = 25; // 5 categories x 5 questions
-    let roundData = {}; // Holds selected questions for the round
+    let roundData = {};
     let selectedChoiceIndex = null;
     let currentQuestion = null;
     let currentCategory = "";
     let currentIndex = -1;
-    let currentWager = 0; // For Daily Double
-
-    // Fixed category order for each round:
+    let currentWager = 0;
+    
+    // Round names and category order:
+    // Round 1: JeoPDE; Round 2: Double JeoPDE; Final: Final JeoPDE.
     const round1Categories = ["Elimin-8 or Not", "Ascari-ology", "Oscheius Underfoot", "Telomere Time", "Data Dilemma"];
-    const round2Categories = ["Parascaris Paradox", "C. Elegance", "Method to the Madness", "Research Riddles", "Evo-lution Revolution", "Nigon Nuances"];
-
-    // Global variable to hold the loaded question bank from the external file.
+    const round2Categories = ["Parascaris Paradox", "C. Elegance", "Method to the Madness", "Research Riddles", "Evo-lution Revolution"];
+    
+    // Global question bank variable
     let questionBank = null;
-
-    // Fetch the question bank JSON from the external file.
+    
+    // Fetch question bank JSON
     fetch('./question_bank.json')
       .then(response => {
         console.log("Fetch response status:", response.status);
@@ -224,7 +236,6 @@
       .then(data => {
         questionBank = data;
         console.log("Question bank loaded successfully:", questionBank);
-        // Remove loading message and enable Start Game buttons.
         document.getElementById('loadingMsg').style.display = 'none';
         document.getElementById('btn1').disabled = false;
         document.getElementById('btn2').disabled = false;
@@ -234,7 +245,7 @@
         document.getElementById('btn3').classList.remove('start-btn');
       })
       .catch(error => console.error('Error loading question bank:', error));
-
+    
     // ---------------- Player Setup Functions ----------------
     function prepareNameInputs(numPlayers) {
       document.getElementById('nameInputs').style.display = 'block';
@@ -259,7 +270,7 @@
       displayScoreBoard();
       document.getElementById('controls').style.display = 'block';
       if (questionBank) {
-        console.log("Initializing Round 1 from bank.");
+        console.log("Initializing JeoPDE (Round 1) from bank.");
         initializeRoundFromBank('round1', round1Categories);
       } else {
         alert("Question bank not loaded yet. Please refresh or try again later.");
@@ -267,7 +278,7 @@
       document.getElementById('gameBoard').style.display = 'grid';
     }
     
-    // ---------------- Initialize Round from External Bank ----------------
+    // ---------------- Initialize Round from Question Bank ----------------
     function initializeRoundFromBank(roundKey, categories) {
       questionsAnswered = 0;
       roundData = {};
@@ -298,7 +309,7 @@
       generateBoard(categories);
     }
     
-    // ---------------- Generate the Game Board ----------------
+    // ---------------- Generate Game Board ----------------
     function generateBoard(categories) {
       const gameBoard = document.getElementById('gameBoard');
       gameBoard.innerHTML = "";
@@ -315,14 +326,15 @@
           cell.className = 'question';
           cell.id = cat + "-" + i;
           cell.textContent = "$" + qData.value;
-          cell.onclick = function() { openQuestion(cat, i); };
+          // When a question cell is clicked, show player-selection modal.
+          cell.onclick = function() { selectAnsweringPlayer(cat, i); };
           gameBoard.appendChild(cell);
         });
       }
       console.log("Game board generated for categories:", categories);
     }
     
-    // ---------------- Scoreboard and Active Player ----------------
+    // ---------------- Scoreboard ----------------
     function displayScoreBoard() {
       const scoreBoard = document.getElementById('scoreBoard');
       scoreBoard.innerHTML = "";
@@ -352,21 +364,23 @@
       });
     }
     
-    // ---------------- Skip Round Functionality ----------------
-    function skipRound() {
-      if (!questionBank) {
-        alert("Question bank not loaded yet. Please wait.");
-        return;
-      }
-      if (round === 1) {
-        round = 2;
-        alert("Skipping to Double Jeopardy (Round 2).");
-        initializeRoundFromBank('round2', round2Categories);
-      } else if (round === 2) {
-        alert("Skipping to Final Jeopardy.");
-        setTimeout(startFinalJeopardy, 1000);
-      }
-      console.log("Skip Round activated. Current round:", round);
+    // ---------------- Select Answering Player Modal ----------------
+    function selectAnsweringPlayer(cat, idx) {
+      let modal = document.getElementById('playerSelectModal');
+      let container = document.getElementById('playerSelectButtons');
+      container.innerHTML = "";
+      players.forEach((player, index) => {
+        let btn = document.createElement('button');
+        btn.textContent = player.name;
+        btn.onclick = function() {
+          currentPlayer = index;
+          updateActivePlayerDisplay();
+          modal.style.display = 'none';
+          openQuestion(cat, idx);
+        };
+        container.appendChild(btn);
+      });
+      modal.style.display = 'block';
     }
     
     // ---------------- Question Modal and Answer Logic ----------------
@@ -458,7 +472,7 @@
         feedbackText = "Correct! You gain " + wagerOrValue + " points.";
         players[currentPlayer].score += wagerOrValue;
       } else {
-        feedbackText = "Incorrect. The correct answer was: " + currentQuestion.choices[currentQuestion.answer] +
+        feedbackText = "Incorrect. The correct response was: " + currentQuestion.choices[currentQuestion.answer] +
                        ". You lose " + wagerOrValue + " points.<br><em>Explanation: " + currentQuestion.explanation + "</em>";
         players[currentPlayer].score -= wagerOrValue;
         if (players.length > 1) {
@@ -482,10 +496,10 @@
       if (questionsAnswered === totalQuestionsPerRound) {
         if (round === 1) {
           round = 2;
-          alert("Round 1 complete! Now entering Double Jeopardy (point values doubled).");
+          alert("JeoPDE complete! Now entering Double JeoPDE (point values doubled).");
           initializeRoundFromBank('round2', round2Categories);
         } else {
-          setTimeout(startFinalJeopardy, 1000);
+          setTimeout(startFinalJeoPDE, 1000);
         }
       }
     }
@@ -494,25 +508,51 @@
       document.getElementById('questionModal').style.display = 'none';
     }
     
-    // ---------------- Final Jeopardy ----------------
-    function startFinalJeopardy() {
+    // ---------------- Final JeoPDE Round ----------------
+    function startFinalJeoPDE() {
       document.getElementById('gameBoard').style.display = 'none';
+      // Choose a final question randomly from the final set.
       let finalQuestions = questionBank.final;
       let finalQuestion = finalQuestions[Math.floor(Math.random() * finalQuestions.length)];
-      let container = document.getElementById('finalQuestionContainer');
-      container.innerHTML = `<h3>${finalQuestion.question}</h3>`;
-      let responsesDiv = document.getElementById('finalPlayerResponses');
-      responsesDiv.innerHTML = "";
+      // Use the category field if available, or default.
+      let finalCategory = finalQuestion.category ? finalQuestion.category : "Final JeoPDE";
+      document.getElementById('finalCategoryTitle').textContent = "Final Category: " + finalCategory;
+      // Show wager section: each player enters their wager BEFORE seeing the question.
+      let wagerDiv = document.getElementById('finalWagerInputs');
+      wagerDiv.innerHTML = "";
       players.forEach((player, idx) => {
-        responsesDiv.innerHTML += `<div id="finalPlayer${idx}">
-          <h4>${player.name} (Current Score: ${player.score})</h4>
-          <p>Enter your wager (max: ${player.score > 0 ? player.score : 1000}): <input type="number" id="finalWager${idx}" value="0"></p>
-          <p>Your Answer (enter the option letter): <input type="text" id="finalAnswer${idx}" placeholder="e.g., C"></p>
+        wagerDiv.innerHTML += `<div id="finalPlayerWager${idx}">
+          <h4>${player.name} (Score: ${player.score})</h4>
+          <p>Wager (max: ${player.score > 0 ? player.score : 1000}): <input type="number" id="finalWager${idx}" value="0"></p>
           </div><hr>`;
       });
-      window.finalQuestion = finalQuestion;
+      document.getElementById('finalWagerSection').style.display = 'block';
+      document.getElementById('finalQuestionSection').style.display = 'none';
       document.getElementById('finalModal').style.display = 'block';
-      console.log("Final Jeopardy started.");
+      window.finalQuestion = finalQuestion;
+      console.log("Final JeoPDE initiated with category:", finalCategory);
+    }
+    
+    function submitFinalWagers() {
+      // After wagers are submitted, reveal final question and ask for each player's final answer.
+      document.getElementById('finalWagerSection').style.display = 'none';
+      let answerDiv = document.getElementById('finalAnswerInputs');
+      answerDiv.innerHTML = "";
+      players.forEach((player, idx) => {
+        answerDiv.innerHTML += `<div id="finalPlayerAnswer${idx}">
+          <h4>${player.name}</h4>
+          <p>Final Answer (Enter the option letter, e.g., A, B, C, D): <input type="text" id="finalAnswer${idx}" maxlength="1"></p>
+          </div><hr>`;
+      });
+      document.getElementById('finalQuestionText').innerHTML = "<strong>" + window.finalQuestion.question + "</strong><br><br>";
+      // Also show the final choices.
+      let choicesHTML = "";
+      window.finalQuestion.choices.forEach((choice, idx) => {
+        choicesHTML += `<p>${String.fromCharCode(65 + idx)}: ${choice}</p>`;
+      });
+      document.getElementById('finalQuestionText').innerHTML += choicesHTML;
+      document.getElementById('finalQuestionSection').style.display = 'block';
+      console.log("Final question revealed.");
     }
     
     function finalConfirm() {
@@ -531,12 +571,12 @@
         }
       });
       updateScoreBoard();
-      alert("Final Jeopardy complete! Check the scoreboard for final results.");
+      alert("Final JeoPDE complete! Check the scoreboard for final results.");
       document.getElementById('finalModal').style.display = 'none';
-      console.log("Final Jeopardy scores updated.");
+      console.log("Final JeoPDE scores updated.");
     }
     
-    // ---------------- Utility: Shuffle an Array ----------------
+    // ---------------- Utility: Shuffle Array ----------------
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1));
